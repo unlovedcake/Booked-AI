@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Define static colors
-  static const Color primary = Color(0xFFC1EBFF);
+  static const Color primary = Color(0xFFd9e5ff);
   static const Color textSecondary = Color(0xFF2d62ff);
+  static const Color bgFooter = Color(0xFF021430);
 
   static const Map<int, Color> _steelBlueColorMap = {
     50: Color.fromRGBO(63, 125, 178, .1),
