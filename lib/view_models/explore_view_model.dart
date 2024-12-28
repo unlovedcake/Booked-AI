@@ -24,23 +24,16 @@ final currentIndexSocialMedia = StateProvider<int?>((ref) {
   return null;
 });
 
-// Riverpod provider for the MenuToggleNotifier
-final menuToggleProvider = StateNotifierProvider<MenuToggleNotifier, bool>((ref) => MenuToggleNotifier());
-
-class MenuToggleNotifier extends StateNotifier<bool> {
-  MenuToggleNotifier() : super(false);
-
-  void toggleMenu() => state = !state;
-}
-
-class ScrollControllerNotifier extends ChangeNotifier {
+class ExploreViewModelNotifier extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
 
   bool isScrollingUp = false;
   bool hasReachedTop = true;
+  bool isToggleMenu = false;
+
   ScrollController get controller => scrollController;
 
-  ScrollControllerNotifier() {
+  ExploreViewModelNotifier() {
     scrollController.addListener(_onScroll);
   }
 
@@ -48,6 +41,11 @@ class ScrollControllerNotifier extends ChangeNotifier {
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
     super.dispose();
+  }
+
+  void toggleMenu() {
+    isToggleMenu = !isToggleMenu;
+    notifyListeners();
   }
 
   void _onScroll() {
@@ -71,7 +69,7 @@ class ScrollControllerNotifier extends ChangeNotifier {
   }
 }
 
-// Define the provider for ScrollControllerNotifier
-final scrollControllerProvider = ChangeNotifierProvider<ScrollControllerNotifier>((ref) {
-  return ScrollControllerNotifier();
+// Define the provider for ExploreViewModelNotifier
+final exploreViewModelNotifier = ChangeNotifierProvider<ExploreViewModelNotifier>((ref) {
+  return ExploreViewModelNotifier();
 });

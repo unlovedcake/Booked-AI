@@ -1,6 +1,6 @@
 import 'package:booked_ai/firebase_options.dart';
 import 'package:booked_ai/utils/router.dart';
-import 'package:booked_ai/views/explore.dart';
+import 'package:booked_ai/views/explore/explore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
