@@ -1,7 +1,9 @@
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/deals_view_model.dart';
 import 'package:booked_ai/view_models/explore_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class MenuBarWidget extends ConsumerWidget {
   const MenuBarWidget({
@@ -42,6 +44,8 @@ class MenuBarWidget extends ConsumerWidget {
                     final navBarTitles = ref.watch(exploreNavBarTitleProvider);
                     var hoveringValue = ref.watch(isHoveringTheNavBar);
                     final _currentIndexNavBar = ref.watch(currentIndexNavBar);
+                    final scrollControllerNotifiers = ref.watch(exploreViewModelNotifier);
+                    final scrollControllerNotifiersDeals = ref.watch(dealsViewModelNotifier);
 
                     return InkWell(
                       onHover: (isHovering) {
@@ -69,6 +73,19 @@ class MenuBarWidget extends ConsumerWidget {
                             onPressed: () {
                               ref.read(currentIndexNavBar.notifier).state = index;
                               ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[0]['isHovering'] = 'No';
+
+                              switch (index) {
+                                case 0:
+                                  scrollControllerNotifiersDeals.scrolPos();
+                                  context.go('/explore');
+
+                                  break;
+                                case 1:
+                                  scrollControllerNotifiers.scrolPos();
+                                  context.go('/deals');
+
+                                  break;
+                              }
                             },
                             child: Text(navBarTitles[index]['title'] ?? '',
                                 style: textTheme.bodyLarge?.copyWith(

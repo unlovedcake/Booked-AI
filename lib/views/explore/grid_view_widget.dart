@@ -6,14 +6,17 @@ class GridViewWidget extends StatelessWidget {
     super.key,
     required this.sizeWidth,
     required this.textTheme,
+    required this.storageKey,
   });
 
   final double sizeWidth;
   final TextTheme textTheme;
+  final String storageKey;
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      key: PageStorageKey(storageKey),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

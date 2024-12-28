@@ -2,27 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final exploreNavBarTitleProvider = StateProvider<List<Map<String, String>>>((ref) {
-  return [
-    {'title': 'Explore', 'isHovering': 'Yes'},
-    {'title': 'Deals', 'isHovering': 'No'},
-    {'title': 'Blog', 'isHovering': 'No'},
-    {'title': 'Partner with Us', 'isHovering': 'No'},
-    {'title': 'About', 'isHovering': 'No'},
-  ];
-});
+// final exploreNavBarTitleProvider = StateProvider<List<Map<String, String>>>((ref) {
+//   return [
+//     {'title': 'Explore', 'isHovering': 'Yes'},
+//     {'title': 'Deals', 'isHovering': 'No'},
+//     {'title': 'Blog', 'isHovering': 'No'},
+//     {'title': 'Partner with Us', 'isHovering': 'No'},
+//     {'title': 'About', 'isHovering': 'No'},
+//   ];
+// });
 
-final isHoveringTheNavBar = StateProvider<String>((ref) {
-  return 'Explore';
-});
+// final isHoveringTheNavBar = StateProvider<String>((ref) {
+//   return 'Explore';
+// });
 
-final currentIndexNavBar = StateProvider<int>((ref) {
-  return 0;
-});
+// final currentIndexNavBar = StateProvider<int>((ref) {
+//   return 0;
+// });
 
-final currentIndexSocialMedia = StateProvider<int?>((ref) {
-  return null;
-});
+// final currentIndexSocialMedia = StateProvider<int?>((ref) {
+//   return null;
+// });
 
 // Riverpod provider for the MenuToggleNotifier
 // final menuToggleProvider = StateNotifierProvider<MenuToggleNotifier, bool>((ref) => MenuToggleNotifier());
@@ -33,19 +33,20 @@ final currentIndexSocialMedia = StateProvider<int?>((ref) {
 //   void toggleMenu() => state = !state;
 // }
 
-class ExploreViewModelNotifier extends ChangeNotifier {
+class DealsViewModelNotifier extends ChangeNotifier {
   bool isScrollingUp = false;
   bool hasReachedTop = true;
   bool isToggleMenu = false;
 
-  double initialScrollOffset = 0.0;
-
   String scrollControllerPage = 'explore';
 
+  double initialScrollOffset = 0.0;
+
   ScrollController? scrollController;
+
   ScrollController get controller => scrollController!;
 
-  ExploreViewModelNotifier() {
+  DealsViewModelNotifier() {
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
   }
@@ -89,15 +90,11 @@ class ExploreViewModelNotifier extends ChangeNotifier {
 
     initialScrollOffset = scrollController!.offset;
 
-    print('initialScrollOffset $initialScrollOffset');
-
-    //scrolPos(position: initialScrollOffset);
-
     notifyListeners();
   }
 }
 
-// Define the provider for ExploreViewModelNotifier
-final exploreViewModelNotifier = ChangeNotifierProvider<ExploreViewModelNotifier>((ref) {
-  return ExploreViewModelNotifier();
+// Define the provider for DealsViewModelNotifier
+final dealsViewModelNotifier = ChangeNotifierProvider<DealsViewModelNotifier>((ref) {
+  return DealsViewModelNotifier();
 });

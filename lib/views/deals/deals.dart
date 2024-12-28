@@ -1,4 +1,6 @@
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/deals_view_model.dart';
+import 'package:booked_ai/view_models/explore_view_model.dart';
 import 'package:booked_ai/views/explore/footer_widget.dart';
 import 'package:booked_ai/views/explore/grid_view_widget.dart';
 import 'package:booked_ai/views/explore/header_widget.dart';
@@ -10,10 +12,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../view_models/explore_view_model.dart';
-
-class ExploreView extends ConsumerWidget {
-  const ExploreView({super.key});
+class DealsView extends ConsumerWidget {
+  const DealsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,18 +22,13 @@ class ExploreView extends ConsumerWidget {
     print('Screen Width $sizeWidth');
 
     final textTheme = Theme.of(context).textTheme;
-    final scrollControllerNotifiers = ref.watch(exploreViewModelNotifier);
+    final scrollControllerNotifiers = ref.watch(dealsViewModelNotifier);
     final scrollController = scrollControllerNotifiers.controller;
     final isScrollingReachTheTop = scrollControllerNotifiers.hasReachedTop;
 
     var isMenuOpen = scrollControllerNotifiers.isToggleMenu;
 
-    final menuToggle = ref.read(exploreViewModelNotifier.notifier);
-
-    //final scrollControllerNotifier = ref.watch(scrollControllerProvider.notifier);
-
-    //var isMenuOpen = ref.watch(menuToggleProvider);
-    //final menuToggle = ref.read(menuToggleProvider.notifier);
+    final menuToggle = ref.read(dealsViewModelNotifier.notifier);
 
     Color containerColor = isScrollingReachTheTop ? Colors.transparent : Colors.white;
 
@@ -57,8 +52,8 @@ class ExploreView extends ConsumerWidget {
                   HeaderWidget(
                     textTheme: textTheme,
                     heightOfContainer: 445,
-                    title: 'Explore',
-                    description: 'Learn about newest travel trends and amazing places to visit!',
+                    title: 'AI Travel Deals',
+                    description: 'Latest AI travel deals for cheap flights, cheap hotels and more!',
                   ),
                   Transform.translate(
                       offset: const Offset(0, -56),
@@ -79,7 +74,7 @@ class ExploreView extends ConsumerWidget {
                       child: GridViewWidget(
                         sizeWidth: sizeWidth,
                         textTheme: textTheme,
-                        storageKey: 'explore',
+                        storageKey: 'deals',
                       ),
                     ),
                   ),
