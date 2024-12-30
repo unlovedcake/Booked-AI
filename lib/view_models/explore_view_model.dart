@@ -1,10 +1,14 @@
+import 'package:booked_ai/models/explore_model.dart';
+import 'package:booked_ai/repositories/explore_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 final exploreNavBarTitleProvider = StateProvider<List<Map<String, String>>>((ref) {
   return [
-    {'title': 'Explore', 'isHovering': 'Yes'},
+    {'title': 'Explore', 'isHovering': 'No'},
     {'title': 'Deals', 'isHovering': 'No'},
     {'title': 'Blog', 'isHovering': 'No'},
     {'title': 'Partner with Us', 'isHovering': 'No'},
@@ -16,62 +20,143 @@ final isHoveringTheNavBar = StateProvider<String>((ref) {
   return 'Explore';
 });
 
-final currentIndexNavBar = StateProvider<int>((ref) {
-  return 0;
-});
-
 final currentIndexSocialMedia = StateProvider<int?>((ref) {
   return null;
 });
 
-// Riverpod provider for the MenuToggleNotifier
-final menuToggleProvider = StateNotifierProvider<MenuToggleNotifier, bool>((ref) => MenuToggleNotifier());
+class ExploreViewModelNotifier extends ChangeNotifier {
+  final ExploreRepository _repository;
 
-class MenuToggleNotifier extends StateNotifier<bool> {
-  MenuToggleNotifier() : super(false);
+  List<ExploreModel> _exploreList = [];
+  bool _isLoading = false;
+  String? _errorMessage;
 
-  void toggleMenu() => state = !state;
-}
-
-class ScrollControllerNotifier extends ChangeNotifier {
-  ScrollController scrollController = ScrollController();
+  List<ExploreModel> get exploreList => _exploreList;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
   bool isScrollingUp = false;
   bool hasReachedTop = true;
-  ScrollController get controller => scrollController;
+  bool isToggleMenu = false;
 
-  ScrollControllerNotifier() {
-    scrollController.addListener(_onScroll);
+  double initialScrollOffset = 0.0;
+
+  int _currentIndexNavBar = 0;
+
+  int get currentIndexNavBar => _currentIndexNavBar;
+
+  String currentUrl = '/explore';
+
+  ScrollController? scrollController;
+  ScrollController get controller => scrollController!;
+
+  ExploreViewModelNotifier(this._repository) {
+    currentUrlPage();
+    fetchExplores();
+
+    //currentIndex();
+
+    scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
+    scrollController!.addListener(_onScroll);
   }
 
+  // Fetch explores
+  Future<void> fetchExplores() async {
+    print('Fetching Explores');
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _exploreList = await _repository.fetchExplores();
+    } catch (e) {
+      _errorMessage = 'Failed to load explores: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void currentUrlPage() {
+    Uri currentUri = Uri.base; // Get the current URL
+    String path = currentUri.path; // Get the path of the URL
+    print('Explore Page: $path');
+
+    if (path == '/explore') {
+      _currentIndexNavBar = 0;
+    } else {
+      _currentIndexNavBar = 1;
+    }
+
+    notifyListeners();
+  }
+
+  // Future<void> currentIndex() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   _currentIndexNavBar = prefs.getInt('currentIndex') ?? 0;
+
+  //   notifyListeners();
+  // }
+
   void disposeController() {
-    scrollController.removeListener(_onScroll);
-    scrollController.dispose();
+    scrollController!.removeListener(_onScroll);
+    scrollController!.dispose();
     super.dispose();
+  }
+
+  void setCurrentIndexNavBar(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    _currentIndexNavBar = index;
+
+    await prefs.setInt('currentIndex', index);
+
+    notifyListeners();
+  }
+
+  void toggleMenu() {
+    isToggleMenu = !isToggleMenu;
+    notifyListeners();
+  }
+
+  void scrolPos() {
+    scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
+    scrollController!.addListener(_onScroll);
+    notifyListeners();
   }
 
   void _onScroll() {
     // Detect scrolling direction
-    if (scrollController.position.userScrollDirection == ScrollDirection.forward) {
+
+    if (scrollController!.position.userScrollDirection == ScrollDirection.forward) {
       // User is scrolling up
       isScrollingUp = false;
-    } else if (scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+    } else if (scrollController!.position.userScrollDirection == ScrollDirection.reverse) {
       // User is scrolling down
       isScrollingUp = false;
     }
 
     // Detect if the user has reached the top edge
-    if (scrollController.position.pixels == 0) {
+    if (scrollController!.position.pixels == 0) {
       hasReachedTop = true; // At the top
     } else {
       hasReachedTop = false; // Not at the top
     }
 
+    initialScrollOffset = scrollController!.offset;
+
+    print('initialScrollOffset $initialScrollOffset');
+
+    //scrolPos(position: initialScrollOffset);
+
     notifyListeners();
   }
 }
 
-// Define the provider for ScrollControllerNotifier
-final scrollControllerProvider = ChangeNotifierProvider<ScrollControllerNotifier>((ref) {
-  return ScrollControllerNotifier();
+final exploreRepositoryProvider = Provider<ExploreRepository>((ref) {
+  return ExploreRepository();
+});
+
+final exploreViewModelProvider = ChangeNotifierProvider<ExploreViewModelNotifier>((ref) {
+  final repository = ref.read(exploreRepositoryProvider);
+  return ExploreViewModelNotifier(repository);
 });

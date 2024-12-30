@@ -1,1 +1,37 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"book-ai-369bc","appId":"1:34831940096:android:6e4b58cd715aba1c6676e5","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"book-ai-369bc","configurations":{"android":"1:34831940096:android:6e4b58cd715aba1c6676e5","ios":"1:34831940096:ios:6dc6543b6ace78776676e5","web":"1:34831940096:web:a8330878996af2046676e5"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "book-ai-369bc",
+          "appId": "1:34831940096:android:6e4b58cd715aba1c6676e5",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "book-ai-369bc",
+          "configurations": {
+            "android": "1:34831940096:android:6e4b58cd715aba1c6676e5",
+            "ios": "1:34831940096:ios:6dc6543b6ace78776676e5",
+            "web": "1:34831940096:web:a8330878996af2046676e5"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
