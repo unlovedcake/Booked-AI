@@ -1,4 +1,5 @@
 import 'package:booked_ai/main.dart';
+import 'package:booked_ai/models/deals_model.dart';
 import 'package:booked_ai/themes/app_colors.dart';
 import 'package:booked_ai/view_models/deals_view_model.dart';
 import 'package:booked_ai/view_models/explore_view_model.dart';
@@ -8,11 +9,13 @@ import 'package:booked_ai/views/explore/header_widget.dart';
 import 'package:booked_ai/views/explore/holiday_deals_widget.dart';
 import 'package:booked_ai/views/explore/menu_bar_widget.dart';
 import 'package:booked_ai/views/explore/navbar_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class DealsView extends ConsumerWidget {
   const DealsView({super.key});
@@ -28,19 +31,21 @@ class DealsView extends ConsumerWidget {
     print('Current path: $path');
 
     final textTheme = Theme.of(context).textTheme;
-    final scrollControllerNotifiers = ref.watch(dealsViewModelNotifier);
-    final scrollController = scrollControllerNotifiers.controller;
-    final isScrollingReachTheTop = scrollControllerNotifiers.hasReachedTop;
+    final dealsViewModel = ref.watch(dealsViewModelProvider);
+    final scrollController = dealsViewModel.controller;
+    final isScrollingReachTheTop = dealsViewModel.hasReachedTop;
 
     final exploreController = ref.watch(exploreViewModelProvider);
 
     exploreController.setCurrentIndexNavBar(1);
 
-    var isMenuOpen = scrollControllerNotifiers.isToggleMenu;
+    var isMenuOpen = dealsViewModel.isToggleMenu;
 
-    final menuToggle = ref.read(dealsViewModelNotifier.notifier);
+    final menuToggle = ref.read(dealsViewModelProvider.notifier);
 
     Color containerColor = isScrollingReachTheTop ? Colors.transparent : Colors.white;
+
+    final dealsViewModels = ref.watch(dealsViewModelProvider);
 
     // final urlPage = ref.watch(currentPageProvider);
     // final url = GoRouter.of(context).state!.matchedLocation;
@@ -132,6 +137,7 @@ class DealsView extends ConsumerWidget {
                           width: sizeWidth * 0.83,
                           color: Colors.white,
                         )),
+                    //Tablet or Mobile
                     sizeWidth <= 1082
                         ? SizedBox(
                             width: sizeWidth < 850
@@ -139,26 +145,26 @@ class DealsView extends ConsumerWidget {
                                 : sizeWidth < 1160
                                     ? sizeWidth * 0.89
                                     : sizeWidth * 0.83,
-                            // color: Colors.red,
-                            // margin: EdgeInsets.symmetric(
-                            //     horizontal: sizeWidth < 768
-                            //         ? 12
-                            //         : sizeWidth > 768 && sizeWidth < 1328
-                            //             ? 40
-                            //             : 140),
                             child: Transform.translate(
-                              offset: const Offset(0, -116),
-                              child: ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: 2, // Number of items in the list
-                                itemBuilder: (context, index) {
-                                  return ListViewDealsWidget(sizeWidth: sizeWidth, textTheme: textTheme);
-                                },
-                              ),
-                            ),
+                                offset: const Offset(0, -116),
+                                child: dealsViewModel.isLoading
+                                    ? const Center(child: CircularProgressIndicator())
+                                    : dealsViewModel.errorMessage != null
+                                        ? Center(child: Text('Error: ${dealsViewModel.errorMessage}'))
+                                        : ListViewDealsWidgetMobile(
+                                            sizeWidth: sizeWidth, textTheme: textTheme, deals: dealsViewModel.deals)),
                           )
-                        : DealsListViewWidget(sizeWidth: sizeWidth, textTheme: textTheme),
+                        :
+                        // Desktop
+                        dealsViewModel.isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : dealsViewModel.errorMessage != null
+                                ? Center(child: Text('Error: ${dealsViewModel.errorMessage}'))
+                                : DealsListViewWidget(
+                                    sizeWidth: sizeWidth,
+                                    textTheme: textTheme,
+                                    deals: dealsViewModel.deals,
+                                  ),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(20.0),
@@ -327,130 +333,135 @@ class DealsView extends ConsumerWidget {
   }
 }
 
-class ListViewDealsWidget extends StatelessWidget {
-  const ListViewDealsWidget({
+class ListViewDealsWidgetMobile extends ConsumerWidget {
+  const ListViewDealsWidgetMobile({
     super.key,
     required this.sizeWidth,
     required this.textTheme,
+    required this.deals,
   });
 
   final double sizeWidth;
   final TextTheme textTheme;
+  final List<DealsModel> deals;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: sizeWidth,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 4),
-            blurRadius: 2,
-            spreadRadius: 0.2,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Wrap(
-            alignment: WrapAlignment.center,
-            children: [
-              Container(
-                color: Colors.red,
-                height: 320,
-                child: Image.network(
-                  'https://cdn.prod.website-files.com/6613f5a399757c17cec4c187/67333a645fb0800174306623_paris-cheap-flights.jpeg',
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: deals.length, // Number of items in the list
+        itemBuilder: (context, index) {
+          final deal = deals[index];
+          return Container(
+            width: sizeWidth,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  offset: const Offset(0, 4),
+                  blurRadius: 2,
+                  spreadRadius: 0.2,
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Cheapest Flights to Paris',
-                    style: textTheme.bodyLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    width: sizeWidth * 0.4,
-                    child: const Text(
-                        maxLines: 4,
-                        'Find the best AI-powered travel deals on cheap flights to Paris. Book now with your AI travel agent for unbeatable prices.'),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  SizedBox(
-                      width: sizeWidth,
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(sizeWidth, 50),
-                            backgroundColor: AppColors.textSecondary, // Button color
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10), // Border radius
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: Text(
-                            'Get the app',
-                            style: textTheme.bodyLarge?.copyWith(color: Colors.white),
-                          )))
-                ],
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          DealsListWidgetMobile(sizeWidth: sizeWidth, textTheme: textTheme),
-          const SizedBox(
-            height: 20,
-          ),
-          DealsListWidgetMobile(sizeWidth: sizeWidth, textTheme: textTheme),
-        ],
-      ),
-    );
+              ],
+            ),
+            child: Column(
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    Container(
+                      height: 320,
+                      child: Image.network(
+                        deal.image,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          deal.title,
+                          style: textTheme.bodyLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          width: sizeWidth * 0.4,
+                          child: Text(maxLines: 4, deal.description),
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        SizedBox(
+                            width: sizeWidth,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  fixedSize: Size(sizeWidth, 50),
+                                  backgroundColor: AppColors.textSecondary, // Button color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10), // Border radius
+                                  ),
+                                ),
+                                onPressed: () {},
+                                child: Text(
+                                  'Get the app',
+                                  style: textTheme.bodyLarge?.copyWith(color: Colors.white),
+                                )))
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                for (var dealDetail in deal.dealsDetails)
+                  DealsListWidgetMobile(sizeWidth: sizeWidth, textTheme: textTheme, dealsDetail: dealDetail),
+
+                // DealsListWidgetMobile(sizeWidth: sizeWidth, textTheme: textTheme),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // DealsListWidgetMobile(sizeWidth: sizeWidth, textTheme: textTheme),
+              ],
+            ),
+          );
+        });
   }
 }
 
-class DealsListViewWidget extends StatelessWidget {
+class DealsListViewWidget extends ConsumerWidget {
   const DealsListViewWidget({
     super.key,
     required this.sizeWidth,
     required this.textTheme,
+    required this.deals,
   });
 
   final double sizeWidth;
   final TextTheme textTheme;
+  final List<DealsModel> deals;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: sizeWidth < 1160 ? sizeWidth * 0.89 : sizeWidth * 0.83,
-      // color: Colors.red,
-      // margin: EdgeInsets.symmetric(
-      //     horizontal: sizeWidth < 768
-      //         ? 12
-      //         : sizeWidth > 768 && sizeWidth < 1328
-      //             ? 40
-      //             : 140),
       child: Transform.translate(
           offset: const Offset(0, -116),
           child: ListView.builder(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: 2, // Number of items in the list
+            itemCount: deals.length, // Number of items in the list
             itemBuilder: (context, index) {
+              final deal = deals[index];
               return Container(
                 margin: EdgeInsets.only(bottom: 16),
                 width: sizeWidth,
@@ -476,25 +487,31 @@ class DealsListViewWidget extends StatelessWidget {
                         Column(
                           children: [
                             Container(
-                              color: Colors.red,
                               height: 320,
                               width: sizeWidth < 1160 ? sizeWidth * 0.28 : sizeWidth * 0.26,
-                              child: Image.network(
-                                'https://cdn.prod.website-files.com/6613f5a399757c17cec4c187/67333a645fb0800174306623_paris-cheap-flights.jpeg',
-                                width: double.infinity,
+                              child: CachedNetworkImage(
                                 fit: BoxFit.cover,
+                                imageUrl: deal.image,
+                                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
                               ),
+
+                              // Image.network(
+                              //   deal.image,
+                              //   width: double.infinity,
+                              //   fit: BoxFit.cover,
+                              // ),
                             ),
                           ],
                         ),
-                        DealsListWidget(sizeWidth: sizeWidth, textTheme: textTheme),
-                        DealsListWidget(sizeWidth: sizeWidth, textTheme: textTheme),
+                        for (var dealDetail in deal.dealsDetails)
+                          DealsListWidget(sizeWidth: sizeWidth, textTheme: textTheme, dealsDetail: dealDetail),
                       ],
                     ),
                     Container(
                       width: sizeWidth * 0.25,
                       child: Text(
-                        'Cheapest Flights to Paris',
+                        deal.title,
                         style: textTheme.bodyLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -503,8 +520,7 @@ class DealsListViewWidget extends StatelessWidget {
                       children: [
                         Container(
                           width: sizeWidth * 0.25,
-                          child: const Text(
-                              'Find the best AI-powered travel deals on cheap flights to Paris. Book now with your AI travel agent for unbeatable prices.'),
+                          child: Text(deal.description),
                         ),
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -535,10 +551,12 @@ class DealsListWidget extends StatelessWidget {
     super.key,
     required this.sizeWidth,
     required this.textTheme,
+    required this.dealsDetail,
   });
 
   final double sizeWidth;
   final TextTheme textTheme;
+  final DealsDetails dealsDetail;
 
   @override
   Widget build(BuildContext context) {
@@ -577,8 +595,9 @@ class DealsListWidget extends StatelessWidget {
                           width: 8,
                         ),
                         Text(
-                          'Available until Feb 6',
-                          style: textTheme.bodyLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.w500),
+                          'Available until ${DateFormat('dd MMM').format(dealsDetail.dateAvailable)}',
+                          style: textTheme.bodyLarge
+                              ?.copyWith(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -602,7 +621,7 @@ class DealsListWidget extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       child: FittedBox(
                           child: Text(
-                        'jetBlue',
+                        dealsDetail.name,
                         style: textTheme.bodyLarge
                             ?.copyWith(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.bold),
                       )),
@@ -611,7 +630,7 @@ class DealsListWidget extends StatelessWidget {
                         alignment: Alignment.center,
                         height: 40,
                         child: Text(
-                          'Economy One Way',
+                          dealsDetail.type,
                           style: textTheme.bodyLarge?.copyWith(
                             color: Colors.grey,
                           ),
@@ -627,13 +646,13 @@ class DealsListWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const FittedBox(child: Text('Jet Blue')),
+                        FittedBox(child: Text(dealsDetail.name)),
                         const SizedBox(
                           width: 8,
                         ),
                         FittedBox(
                             child: Text(
-                          'London to New York',
+                          '${dealsDetail.from} to ${dealsDetail.to}',
                           style: textTheme.bodyLarge
                               ?.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                         )),
@@ -650,14 +669,22 @@ class DealsListWidget extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    child: const FittedBox(child: Text('\$301 cheaper than usual')),
+                    child: FittedBox(
+                        child: Text(
+                      '\$${dealsDetail.price}',
+                    )),
                   ),
-                  Container(
-                      alignment: Alignment.center,
-                      height: 40,
-                      child: const Text(
-                        '\$600,',
-                      ))
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text('\$600', style: textTheme.bodyLarge?.copyWith(color: Colors.grey.shade400)),
+                      Container(
+                        height: 1,
+                        width: 40,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  )
                 ],
               ),
               Row(
@@ -688,8 +715,11 @@ class DealsListWidget extends StatelessWidget {
                             fit: BoxFit.cover,
                             'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6730b31557adfeb124b63470_tag.svg',
                           ),
+                          SizedBox(
+                            width: 5,
+                          ),
                           Text(
-                            '\$299,',
+                            '\$${dealsDetail.price}',
                             style: textTheme.bodyLarge?.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -709,10 +739,12 @@ class DealsListWidgetMobile extends StatelessWidget {
     super.key,
     required this.sizeWidth,
     required this.textTheme,
+    required this.dealsDetail,
   });
 
   final double sizeWidth;
   final TextTheme textTheme;
+  final DealsDetails dealsDetail;
 
   @override
   Widget build(BuildContext context) {
@@ -750,7 +782,7 @@ class DealsListWidgetMobile extends StatelessWidget {
                           width: 8,
                         ),
                         Text(
-                          'Available until Feb 6',
+                          'Available until ${DateFormat('dd MMM').format(dealsDetail.dateAvailable)}',
                           style: textTheme.bodyLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -775,7 +807,7 @@ class DealsListWidgetMobile extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       child: FittedBox(
                           child: Text(
-                        'jetBlue',
+                        dealsDetail.name,
                         style: textTheme.bodyLarge
                             ?.copyWith(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.bold),
                       )),
@@ -784,7 +816,7 @@ class DealsListWidgetMobile extends StatelessWidget {
                         alignment: Alignment.center,
                         height: 40,
                         child: Text(
-                          'Economy One Way',
+                          dealsDetail.type,
                           style: textTheme.bodyLarge?.copyWith(
                             color: Colors.grey,
                           ),
@@ -800,13 +832,13 @@ class DealsListWidgetMobile extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const FittedBox(child: Text('Jet Blue')),
+                        FittedBox(child: Text(dealsDetail.name)),
                         const SizedBox(
                           width: 8,
                         ),
                         FittedBox(
                             child: Text(
-                          'London to New York',
+                          '${dealsDetail.from} to ${dealsDetail.to}',
                           style: textTheme.bodyLarge
                               ?.copyWith(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                         )),
@@ -823,14 +855,19 @@ class DealsListWidgetMobile extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    child: const FittedBox(child: Text('\$301 cheaper than usual')),
+                    child: FittedBox(child: Text('\$${dealsDetail.price}')),
                   ),
-                  Container(
-                      alignment: Alignment.center,
-                      height: 40,
-                      child: const Text(
-                        '\$600,',
-                      ))
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text('\$600', style: textTheme.bodyLarge?.copyWith(color: Colors.grey.shade400)),
+                      Container(
+                        height: 1,
+                        width: 40,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  )
                 ],
               ),
               Row(
@@ -861,8 +898,11 @@ class DealsListWidgetMobile extends StatelessWidget {
                             fit: BoxFit.cover,
                             'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6730b31557adfeb124b63470_tag.svg',
                           ),
+                          SizedBox(
+                            width: 5,
+                          ),
                           Text(
-                            '\$299,',
+                            '\$${dealsDetail.price}',
                             style: textTheme.bodyLarge?.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
                           ),
                         ],

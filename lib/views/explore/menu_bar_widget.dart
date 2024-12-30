@@ -46,7 +46,7 @@ class MenuBarWidget extends ConsumerWidget {
 
                     //final _currentIndexNavBar = ref.watch(currentIndexNavBar);
                     final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
-                    final scrollControllerNotifiersDeals = ref.watch(dealsViewModelNotifier);
+                    final scrollControllerNotifiersDeals = ref.watch(dealsViewModelProvider);
 
                     return InkWell(
                       onHover: (isHovering) {

@@ -69,7 +69,7 @@ class ExploreView extends ConsumerWidget {
                         offset: const Offset(0, -56),
                         child: Container(
                           height: 56,
-                          margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 850 ? 15 : 145),
+                          width: sizeWidth * 0.61,
                           color: Colors.white,
                         )),
                     Container(

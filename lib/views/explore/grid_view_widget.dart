@@ -58,33 +58,27 @@ class GridViewWidget extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 22,
                           ),
-
                           CachedNetworkImage(
                             fit: BoxFit.cover,
                             imageUrl: explore.image,
-                            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                            errorWidget: (context, url, error) => Icon(Icons.error),
+                            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) => const Icon(Icons.error),
                           ),
-                          // Image.network(
-                          //   explore.image,
-                          //   width: double.infinity,
-                          //   fit: BoxFit.cover,
-                          // ),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 2,
                                 ),
                                 Text(
                                   explore.title,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -120,11 +114,11 @@ class GridViewWidget extends ConsumerWidget {
                                 ),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on, color: Colors.grey, size: 26),
-                                    SizedBox(width: 6),
+                                    const Icon(Icons.location_on, color: Colors.grey, size: 26),
+                                    const SizedBox(width: 6),
                                     Text(
                                       explore.location,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.black,
@@ -134,11 +128,11 @@ class GridViewWidget extends ConsumerWidget {
                                 ),
                                 Row(
                                   children: [
-                                    Icon(Icons.card_giftcard, color: Colors.grey, size: 26),
-                                    SizedBox(width: 6),
+                                    const Icon(Icons.card_giftcard, color: Colors.grey, size: 26),
+                                    const SizedBox(width: 6),
                                     Text(
                                       explore.activity,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.black,
@@ -154,13 +148,13 @@ class GridViewWidget extends ConsumerWidget {
                                   ),
                                   title: Text(
                                     explore.userName,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black,
                                     ),
                                   ),
-                                  subtitle: Text('3 min read'),
+                                  subtitle: const Text('3 min read'),
                                 )
                               ],
                             ),

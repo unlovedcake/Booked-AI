@@ -27,12 +27,10 @@ final currentIndexSocialMedia = StateProvider<int?>((ref) {
 class ExploreViewModelNotifier extends ChangeNotifier {
   final ExploreRepository _repository;
 
-  // State variables
   List<ExploreModel> _exploreList = [];
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Getters
   List<ExploreModel> get exploreList => _exploreList;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -64,6 +62,7 @@ class ExploreViewModelNotifier extends ChangeNotifier {
 
   // Fetch explores
   Future<void> fetchExplores() async {
+    print('Fetching Explores');
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -157,7 +156,6 @@ final exploreRepositoryProvider = Provider<ExploreRepository>((ref) {
   return ExploreRepository();
 });
 
-// Define the provider for ExploreViewModelNotifier
 final exploreViewModelProvider = ChangeNotifierProvider<ExploreViewModelNotifier>((ref) {
   final repository = ref.read(exploreRepositoryProvider);
   return ExploreViewModelNotifier(repository);

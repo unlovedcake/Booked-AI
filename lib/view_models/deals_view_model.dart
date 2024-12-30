@@ -1,3 +1,6 @@
+import 'package:booked_ai/models/deals_model.dart';
+import 'package:booked_ai/repositories/deals_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,6 +37,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // }
 
 class DealsViewModelNotifier extends ChangeNotifier {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  final DealsRepository _repository;
+
+  List<DealsModel> _deals = [];
+  List<DealsModel> get deals => _deals;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
   bool isScrollingUp = false;
   bool hasReachedTop = true;
   bool isToggleMenu = false;
@@ -46,7 +62,8 @@ class DealsViewModelNotifier extends ChangeNotifier {
 
   ScrollController get controller => scrollController!;
 
-  DealsViewModelNotifier() {
+  DealsViewModelNotifier(this._repository) {
+    fetchDeals();
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
   }
@@ -55,6 +72,23 @@ class DealsViewModelNotifier extends ChangeNotifier {
     scrollController!.removeListener(_onScroll);
     scrollController!.dispose();
     super.dispose();
+  }
+
+  // Fetch deals from Firestore
+  Future<void> fetchDeals() async {
+    print('Fetching Deals');
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _deals = await _repository.fetchDeals();
+    } catch (e) {
+      _errorMessage = 'Failed to load deals: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void toggleMenu() {
@@ -95,7 +129,13 @@ class DealsViewModelNotifier extends ChangeNotifier {
   }
 }
 
+final dealsRepositoryProvider = Provider<DealsRepository>((ref) {
+  return DealsRepository();
+});
+
 // Define the provider for DealsViewModelNotifier
-final dealsViewModelNotifier = ChangeNotifierProvider<DealsViewModelNotifier>((ref) {
-  return DealsViewModelNotifier();
+final dealsViewModelProvider = ChangeNotifierProvider<DealsViewModelNotifier>((ref) {
+  final repository = ref.read(dealsRepositoryProvider);
+
+  return DealsViewModelNotifier(repository);
 });
