@@ -43,7 +43,8 @@ class MenuBarWidget extends ConsumerWidget {
                   children: List.generate(ref.watch(exploreNavBarTitleProvider).length, (index) {
                     final navBarTitles = ref.watch(exploreNavBarTitleProvider);
                     var hoveringValue = ref.watch(isHoveringTheNavBar);
-                    final _currentIndexNavBar = ref.watch(currentIndexNavBar);
+
+                    //final _currentIndexNavBar = ref.watch(currentIndexNavBar);
                     final scrollControllerNotifiers = ref.watch(exploreViewModelNotifier);
                     final scrollControllerNotifiersDeals = ref.watch(dealsViewModelNotifier);
 
@@ -62,7 +63,7 @@ class MenuBarWidget extends ConsumerWidget {
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         decoration: BoxDecoration(
-                          color: _currentIndexNavBar == index
+                          color: scrollControllerNotifiers.currentIndexNavBar == index
                               ? Colors.transparent
                               : navBarTitles[index]['isHovering'] == 'Yes'
                                   ? Colors.white10
@@ -71,7 +72,8 @@ class MenuBarWidget extends ConsumerWidget {
                         ),
                         child: TextButton(
                             onPressed: () {
-                              ref.read(currentIndexNavBar.notifier).state = index;
+                              ref.read(exploreViewModelNotifier).setCurrentIndexNavBar(index);
+                              //ref.read(currentIndexNavBar.notifier).state = index;
                               ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[0]['isHovering'] = 'No';
 
                               switch (index) {
@@ -90,7 +92,8 @@ class MenuBarWidget extends ConsumerWidget {
                             child: Text(navBarTitles[index]['title'] ?? '',
                                 style: textTheme.bodyLarge?.copyWith(
                                   fontWeight: FontWeight.w400,
-                                  color: _currentIndexNavBar == index || navBarTitles[index]['isHovering'] == 'Yes'
+                                  color: scrollControllerNotifiers.currentIndexNavBar == index ||
+                                          navBarTitles[index]['isHovering'] == 'Yes'
                                       ? AppColors.textSecondary
                                       : Colors.grey.shade600,
                                 ))),

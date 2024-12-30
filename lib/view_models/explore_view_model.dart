@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 final exploreNavBarTitleProvider = StateProvider<List<Map<String, String>>>((ref) {
   return [
-    {'title': 'Explore', 'isHovering': 'Yes'},
+    {'title': 'Explore', 'isHovering': 'No'},
     {'title': 'Deals', 'isHovering': 'No'},
     {'title': 'Blog', 'isHovering': 'No'},
     {'title': 'Partner with Us', 'isHovering': 'No'},
@@ -16,22 +18,9 @@ final isHoveringTheNavBar = StateProvider<String>((ref) {
   return 'Explore';
 });
 
-final currentIndexNavBar = StateProvider<int>((ref) {
-  return 0;
-});
-
 final currentIndexSocialMedia = StateProvider<int?>((ref) {
   return null;
 });
-
-// Riverpod provider for the MenuToggleNotifier
-// final menuToggleProvider = StateNotifierProvider<MenuToggleNotifier, bool>((ref) => MenuToggleNotifier());
-
-// class MenuToggleNotifier extends StateNotifier<bool> {
-//   MenuToggleNotifier() : super(false);
-
-//   void toggleMenu() => state = !state;
-// }
 
 class ExploreViewModelNotifier extends ChangeNotifier {
   bool isScrollingUp = false;
@@ -40,20 +29,58 @@ class ExploreViewModelNotifier extends ChangeNotifier {
 
   double initialScrollOffset = 0.0;
 
-  String scrollControllerPage = 'explore';
+  int _currentIndexNavBar = 0;
+
+  int get currentIndexNavBar => _currentIndexNavBar;
+
+  String currentUrl = '/explore';
 
   ScrollController? scrollController;
   ScrollController get controller => scrollController!;
 
   ExploreViewModelNotifier() {
+    currentUrlPage();
+
+    //currentIndex();
+
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
+  }
+
+  void currentUrlPage() {
+    Uri currentUri = Uri.base; // Get the current URL
+    String path = currentUri.path; // Get the path of the URL
+    print('Explore Page: $path');
+
+    if (path == '/explore') {
+      _currentIndexNavBar = 0;
+    } else {
+      _currentIndexNavBar = 1;
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> currentIndex() async {
+    final prefs = await SharedPreferences.getInstance();
+    _currentIndexNavBar = prefs.getInt('currentIndex') ?? 0;
+
+    notifyListeners();
   }
 
   void disposeController() {
     scrollController!.removeListener(_onScroll);
     scrollController!.dispose();
     super.dispose();
+  }
+
+  void setCurrentIndexNavBar(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    _currentIndexNavBar = index;
+
+    await prefs.setInt('currentIndex', index);
+
+    notifyListeners();
   }
 
   void toggleMenu() {
@@ -69,8 +96,6 @@ class ExploreViewModelNotifier extends ChangeNotifier {
 
   void _onScroll() {
     // Detect scrolling direction
-
-    print('Scroll $scrollControllerPage');
 
     if (scrollController!.position.userScrollDirection == ScrollDirection.forward) {
       // User is scrolling up

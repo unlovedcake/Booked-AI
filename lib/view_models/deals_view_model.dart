@@ -63,6 +63,7 @@ class DealsViewModelNotifier extends ChangeNotifier {
   }
 
   void scrolPos() {
+    print('Deals Page');
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
     notifyListeners();

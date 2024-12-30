@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
 class HeaderWidget extends StatelessWidget {
-  const HeaderWidget({
+  HeaderWidget({
     super.key,
     required this.textTheme,
     required this.heightOfContainer,
     required this.title,
     required this.description,
+    this.widget,
   });
 
   final TextTheme textTheme;
   final double heightOfContainer;
   final String title;
   final String description;
+  Widget? widget;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class HeaderWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(
-              height: 40,
+              height: 100,
             ),
             Text(
               title,
@@ -49,6 +51,7 @@ class HeaderWidget extends StatelessWidget {
                     ?.copyWith(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.grey.shade700),
               ),
             ),
+            if (widget != null) Container(margin: EdgeInsets.only(top: 40, left: 20, right: 20), child: widget!),
           ],
         ));
   }

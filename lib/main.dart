@@ -1,5 +1,6 @@
 import 'package:booked_ai/firebase_options.dart';
 import 'package:booked_ai/utils/router.dart';
+import 'package:booked_ai/view_models/explore_view_model.dart';
 import 'package:booked_ai/views/deals/deals.dart';
 import 'package:booked_ai/views/explore/explore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,6 +27,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
     redirect: (context, state) {
       ref.read(currentPageProvider.notifier).state = state.matchedLocation;
+
+      print('state.matchedLocation ${state.matchedLocation}');
+
       return null;
     },
   );
@@ -43,18 +47,18 @@ Future<void> main() async {
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goRouter = ref.watch(goRouterProvider);
+    final goRouter = ref.watch(appRouter);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
+
       title: 'Book AI',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      routerConfig: appRouter,
+      routerConfig: goRouter,
       // routerDelegate: goRouter.routerDelegate,
       // routeInformationParser: goRouter.routeInformationParser,
       // routeInformationProvider: goRouter.routeInformationProvider,
