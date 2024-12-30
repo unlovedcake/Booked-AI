@@ -1,3 +1,5 @@
+import 'package:booked_ai/models/explore_model.dart';
+import 'package:booked_ai/repositories/explore_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +25,18 @@ final currentIndexSocialMedia = StateProvider<int?>((ref) {
 });
 
 class ExploreViewModelNotifier extends ChangeNotifier {
+  final ExploreRepository _repository;
+
+  // State variables
+  List<ExploreModel> _exploreList = [];
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  // Getters
+  List<ExploreModel> get exploreList => _exploreList;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+
   bool isScrollingUp = false;
   bool hasReachedTop = true;
   bool isToggleMenu = false;
@@ -38,13 +52,30 @@ class ExploreViewModelNotifier extends ChangeNotifier {
   ScrollController? scrollController;
   ScrollController get controller => scrollController!;
 
-  ExploreViewModelNotifier() {
+  ExploreViewModelNotifier(this._repository) {
     currentUrlPage();
+    fetchExplores();
 
     //currentIndex();
 
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
+  }
+
+  // Fetch explores
+  Future<void> fetchExplores() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _exploreList = await _repository.fetchExplores();
+    } catch (e) {
+      _errorMessage = 'Failed to load explores: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void currentUrlPage() {
@@ -61,12 +92,12 @@ class ExploreViewModelNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> currentIndex() async {
-    final prefs = await SharedPreferences.getInstance();
-    _currentIndexNavBar = prefs.getInt('currentIndex') ?? 0;
+  // Future<void> currentIndex() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   _currentIndexNavBar = prefs.getInt('currentIndex') ?? 0;
 
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
 
   void disposeController() {
     scrollController!.removeListener(_onScroll);
@@ -122,7 +153,12 @@ class ExploreViewModelNotifier extends ChangeNotifier {
   }
 }
 
+final exploreRepositoryProvider = Provider<ExploreRepository>((ref) {
+  return ExploreRepository();
+});
+
 // Define the provider for ExploreViewModelNotifier
-final exploreViewModelNotifier = ChangeNotifierProvider<ExploreViewModelNotifier>((ref) {
-  return ExploreViewModelNotifier();
+final exploreViewModelProvider = ChangeNotifierProvider<ExploreViewModelNotifier>((ref) {
+  final repository = ref.read(exploreRepositoryProvider);
+  return ExploreViewModelNotifier(repository);
 });

@@ -32,7 +32,7 @@ class DealsView extends ConsumerWidget {
     final scrollController = scrollControllerNotifiers.controller;
     final isScrollingReachTheTop = scrollControllerNotifiers.hasReachedTop;
 
-    final exploreController = ref.watch(exploreViewModelNotifier);
+    final exploreController = ref.watch(exploreViewModelProvider);
 
     exploreController.setCurrentIndexNavBar(1);
 

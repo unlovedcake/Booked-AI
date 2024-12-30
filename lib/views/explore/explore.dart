@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:booked_ai/models/explore_model.dart';
 import 'package:booked_ai/themes/app_colors.dart';
 import 'package:booked_ai/views/explore/footer_widget.dart';
 import 'package:booked_ai/views/explore/grid_view_widget.dart';
@@ -5,6 +8,7 @@ import 'package:booked_ai/views/explore/header_widget.dart';
 import 'package:booked_ai/views/explore/holiday_deals_widget.dart';
 import 'package:booked_ai/views/explore/menu_bar_widget.dart';
 import 'package:booked_ai/views/explore/navbar_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +29,7 @@ class ExploreView extends ConsumerWidget {
     print('Current path: $path');
 
     final textTheme = Theme.of(context).textTheme;
-    final scrollControllerNotifiers = ref.watch(exploreViewModelNotifier);
+    final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
     final scrollController = scrollControllerNotifiers.controller;
     final isScrollingReachTheTop = scrollControllerNotifiers.hasReachedTop;
 
@@ -33,7 +37,7 @@ class ExploreView extends ConsumerWidget {
 
     scrollControllerNotifiers.setCurrentIndexNavBar(0);
 
-    final menuToggle = ref.read(exploreViewModelNotifier.notifier);
+    final menuToggle = ref.read(exploreViewModelProvider.notifier);
 
     Color containerColor = isScrollingReachTheTop ? Colors.transparent : Colors.white;
 
@@ -231,7 +235,84 @@ class ExploreView extends ConsumerWidget {
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+                                    final CollectionReference exploreCollection = firestore.collection('explores');
+
+                                    const String chars =
+                                        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                                    final Random random = Random();
+                                    var id = List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
+
+                                    // Sample data for 5 explores
+                                    final List<ExploreModel> explores = [
+                                      ExploreModel(
+                                        id: id,
+                                        image: '',
+                                        title: 'Explore the Mountains',
+                                        description: 'A thrilling experience in the mountains.',
+                                        location: 'Himalayas',
+                                        activity: 'Hiking',
+                                        userName: 'John Doe',
+                                        userImage: 'https://example.com/images/johndoe.png',
+                                        createdAt: DateTime.now(),
+                                      ),
+                                      ExploreModel(
+                                        id: id,
+                                        image: '',
+                                        title: 'City Lights Adventure',
+                                        description: 'Discover the beauty of urban landscapes.',
+                                        location: 'New York',
+                                        activity: 'City Tour',
+                                        userName: 'Jane Smith',
+                                        userImage: 'https://example.com/images/janesmith.png',
+                                        createdAt: DateTime.now(),
+                                      ),
+                                      ExploreModel(
+                                        id: id,
+                                        image: '',
+                                        title: 'Beach Bliss',
+                                        description: 'Relax at the serene beaches.',
+                                        location: 'Maldives',
+                                        activity: 'Beach Relaxation',
+                                        userName: 'Alex Johnson',
+                                        userImage: 'https://example.com/images/alexjohnson.png',
+                                        createdAt: DateTime.now(),
+                                      ),
+                                      ExploreModel(
+                                        id: id,
+                                        image: '',
+                                        title: 'Safari Adventure',
+                                        description: 'Experience the thrill of a safari.',
+                                        location: 'Africa',
+                                        activity: 'Safari',
+                                        userName: 'Chris Lee',
+                                        userImage: 'https://example.com/images/chrislee.png',
+                                        createdAt: DateTime.now(),
+                                      ),
+                                      // ExploreModel(
+                                      //   id: id,
+                                      //image: '',
+                                      //   title: 'Cultural Exploration',
+                                      //   description: 'Immerse yourself in local cultures.',
+                                      //   location: 'Japan',
+                                      //   activity: 'Cultural Tour',
+                                      //   userName: 'Emily Davis',
+                                      //   userImage: 'https://example.com/images/emilydavis.png',
+                                      //   createdAt: DateTime.now(),
+                                      // ),
+                                    ];
+
+                                    try {
+                                      // Add each explore to Firestore
+                                      for (var explore in explores) {
+                                        await exploreCollection.add(explore.toJson());
+                                      }
+                                      print('Explores added successfully!');
+                                    } catch (e) {
+                                      print('Error adding explores: $e');
+                                    }
+                                  },
                                   child: Text(
                                     'Get the BETA',
                                     style: textTheme.bodyLarge?.copyWith(color: Colors.white),

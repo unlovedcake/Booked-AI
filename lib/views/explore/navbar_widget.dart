@@ -22,7 +22,7 @@ class NavBarWidget extends ConsumerWidget {
         final navBarTitles = ref.watch(exploreNavBarTitleProvider);
         var hoveringValue = ref.watch(isHoveringTheNavBar);
         //final _currentIndexNavBar = ref.watch(currentIndexNavBar);
-        final scrollControllerNotifiers = ref.watch(exploreViewModelNotifier);
+        final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
         final scrollControllerNotifiersDeals = ref.watch(dealsViewModelNotifier);
 
         return InkWell(
@@ -46,7 +46,7 @@ class NavBarWidget extends ConsumerWidget {
             ),
             child: TextButton(
                 onPressed: () {
-                  ref.read(exploreViewModelNotifier).setCurrentIndexNavBar(index);
+                  ref.read(exploreViewModelProvider).setCurrentIndexNavBar(index);
                   //ref.read(currentIndexNavBar.notifier).state = index;
                   ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[0]['isHovering'] = 'No';
 
