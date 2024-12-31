@@ -22,8 +22,8 @@ class NavBarWidget extends ConsumerWidget {
         final navBarTitles = ref.watch(exploreNavBarTitleProvider);
         var hoveringValue = ref.watch(isHoveringTheNavBar);
         //final _currentIndexNavBar = ref.watch(currentIndexNavBar);
-        final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
-        final scrollControllerNotifiersDeals = ref.watch(dealsViewModelProvider);
+        final exploreViewModel = ref.watch(exploreViewModelProvider);
+        final dealsViewModel = ref.watch(dealsViewModelProvider);
 
         return InkWell(
           onHover: (isHovering) {
@@ -37,7 +37,7 @@ class NavBarWidget extends ConsumerWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             decoration: BoxDecoration(
-              color: scrollControllerNotifiers.currentIndexNavBar == index
+              color: exploreViewModel.currentIndexNavBar == index
                   ? Colors.transparent
                   : navBarTitles[index]['isHovering'] == 'Yes'
                       ? Colors.white10
@@ -52,13 +52,13 @@ class NavBarWidget extends ConsumerWidget {
 
                   switch (index) {
                     case 0:
-                      scrollControllerNotifiersDeals.scrolPos();
+                      dealsViewModel.scrolPos();
 
                       context.go('/explore');
 
                       break;
                     case 1:
-                      scrollControllerNotifiers.scrolPos();
+                      exploreViewModel.scrolPos();
 
                       context.go('/deals');
 
@@ -68,8 +68,7 @@ class NavBarWidget extends ConsumerWidget {
                 child: Text(navBarTitles[index]['title'] ?? '',
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w400,
-                      color: scrollControllerNotifiers.currentIndexNavBar == index ||
-                              navBarTitles[index]['isHovering'] == 'Yes'
+                      color: exploreViewModel.currentIndexNavBar == index || navBarTitles[index]['isHovering'] == 'Yes'
                           ? AppColors.textSecondary
                           : Colors.grey.shade600,
                     ))),

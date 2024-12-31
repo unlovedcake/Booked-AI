@@ -52,9 +52,6 @@ class DealsViewModelNotifier extends ChangeNotifier {
 
   bool isScrollingUp = false;
   bool hasReachedTop = true;
-  bool isToggleMenu = false;
-
-  String scrollControllerPage = 'explore';
 
   double initialScrollOffset = 0.0;
 
@@ -91,11 +88,6 @@ class DealsViewModelNotifier extends ChangeNotifier {
     }
   }
 
-  void toggleMenu() {
-    isToggleMenu = !isToggleMenu;
-    notifyListeners();
-  }
-
   void scrolPos() {
     print('Deals Page');
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
@@ -104,10 +96,6 @@ class DealsViewModelNotifier extends ChangeNotifier {
   }
 
   void _onScroll() {
-    // Detect scrolling direction
-
-    print('Scroll $scrollControllerPage');
-
     if (scrollController!.position.userScrollDirection == ScrollDirection.forward) {
       // User is scrolling up
       isScrollingUp = false;

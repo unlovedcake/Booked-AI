@@ -40,7 +40,7 @@ class GridViewWidget extends ConsumerWidget {
                       ? 0.73
                       : sizeWidth > 768 && sizeWidth <= 1000
                           ? 0.63
-                          : 0.61,
+                          : 0.64,
                 ),
                 itemCount: exploreViewModel.exploreList.length,
                 itemBuilder: (context, index) {

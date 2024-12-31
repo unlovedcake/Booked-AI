@@ -26,26 +26,18 @@ class DealsView extends ConsumerWidget {
     final sizeHeight = MediaQuery.of(context).size.height;
     print('Screen Width $sizeWidth');
 
-    Uri currentUri = Uri.base; // Get the current URL
-    String path = currentUri.path; // Get the path of the URL
-    print('Current path: $path');
-
     final textTheme = Theme.of(context).textTheme;
     final dealsViewModel = ref.watch(dealsViewModelProvider);
     final scrollController = dealsViewModel.controller;
     final isScrollingReachTheTop = dealsViewModel.hasReachedTop;
 
-    final exploreController = ref.watch(exploreViewModelProvider);
+    final exploreViewModel = ref.watch(exploreViewModelProvider);
 
-    exploreController.setCurrentIndexNavBar(1);
+    exploreViewModel.setCurrentIndexNavBar(1);
 
-    var isMenuOpen = dealsViewModel.isToggleMenu;
-
-    final menuToggle = ref.read(dealsViewModelProvider.notifier);
+    var isMenuOpen = exploreViewModel.isToggleMenu;
 
     Color containerColor = isScrollingReachTheTop ? Colors.transparent : Colors.white;
-
-    final dealsViewModels = ref.watch(dealsViewModelProvider);
 
     // final urlPage = ref.watch(currentPageProvider);
     // final url = GoRouter.of(context).state!.matchedLocation;
@@ -256,7 +248,6 @@ class DealsView extends ConsumerWidget {
                 ),
               ),
             ),
-            MenuBarWidget(isMenuOpen: isMenuOpen, textTheme: textTheme, sizeWidth: sizeWidth),
             Positioned(
               top: 0,
               left: 0,
@@ -270,58 +261,64 @@ class DealsView extends ConsumerWidget {
                     color: AppColors.primary,
                     child: HolidayDealsWidget(textTheme: textTheme),
                   ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 800),
-                    margin: const EdgeInsets.only(right: 15),
-                    height: 100,
-                    color: containerColor,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width < 850
-                              ? 12
-                              : MediaQuery.of(context).size.width < 1210
-                                  ? 100
-                                  : 140),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            height: 60,
-                            child: Image.network(
-                                'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6711d4c2add268ab486ba5e2_Logo%20(7)-p-500.png'),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 800),
+                        margin: const EdgeInsets.only(right: 15),
+                        height: 100,
+                        color: containerColor,
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: MediaQuery.of(context).size.width < 850
+                                  ? 12
+                                  : MediaQuery.of(context).size.width < 1210
+                                      ? 100
+                                      : 140),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                height: 60,
+                                child: Image.network(
+                                    'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6711d4c2add268ab486ba5e2_Logo%20(7)-p-500.png'),
+                              ),
+                              const Expanded(child: SizedBox()),
+                              MediaQuery.of(context).size.width <= 1126
+                                  ? IconButton(
+                                      icon: AnimatedIcon(
+                                        icon: AnimatedIcons.menu_close,
+                                        progress: isMenuOpen
+                                            ? const AlwaysStoppedAnimation(1.0)
+                                            : const AlwaysStoppedAnimation(0.0),
+                                      ),
+                                      onPressed: () => exploreViewModel.toggleMenu(),
+                                    )
+                                  : NavBarWidget(textTheme: textTheme),
+                              const SizedBox(
+                                width: 16,
+                              ),
+                              sizeWidth <= 1126
+                                  ? const SizedBox()
+                                  : ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.textSecondary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                      ),
+                                      onPressed: () {},
+                                      child: Text(
+                                        'Get the BETA',
+                                        style: textTheme.bodyLarge?.copyWith(color: Colors.white),
+                                      )),
+                            ],
                           ),
-                          const Expanded(child: SizedBox()),
-                          MediaQuery.of(context).size.width <= 1126
-                              ? IconButton(
-                                  icon: AnimatedIcon(
-                                    icon: AnimatedIcons.menu_close,
-                                    progress: isMenuOpen
-                                        ? const AlwaysStoppedAnimation(1.0)
-                                        : const AlwaysStoppedAnimation(0.0),
-                                  ),
-                                  onPressed: () => menuToggle.toggleMenu(),
-                                )
-                              : NavBarWidget(textTheme: textTheme),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          sizeWidth <= 1126
-                              ? const SizedBox()
-                              : ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.textSecondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                                  ),
-                                  onPressed: () {},
-                                  child: Text(
-                                    'Get the BETA',
-                                    style: textTheme.bodyLarge?.copyWith(color: Colors.white),
-                                  )),
-                        ],
+                        ),
                       ),
-                    ),
+                      MenuBarWidget(isMenuOpen: isMenuOpen, textTheme: textTheme, sizeWidth: sizeWidth),
+                    ],
                   ),
                 ],
               ),
@@ -912,6 +909,9 @@ class DealsListWidgetMobile extends StatelessWidget {
             ],
           ),
         ),
+        SizedBox(
+          height: 20,
+        )
       ],
     );
   }

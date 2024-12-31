@@ -114,6 +114,7 @@ class ExploreViewModelNotifier extends ChangeNotifier {
   }
 
   void toggleMenu() {
+    print('Toggle');
     isToggleMenu = !isToggleMenu;
     notifyListeners();
   }

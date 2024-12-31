@@ -24,9 +24,6 @@ class ExploreView extends ConsumerWidget {
     final sizeWidth = MediaQuery.of(context).size.width;
     final sizeHeight = MediaQuery.of(context).size.height;
     print('Screen Width $sizeWidth');
-    Uri currentUri = Uri.base; // Get the current URL
-    String path = currentUri.path; // Get the path of the URL
-    print('Current path: $path');
 
     final textTheme = Theme.of(context).textTheme;
     final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
@@ -179,7 +176,6 @@ class ExploreView extends ConsumerWidget {
                 ),
               ),
             ),
-            MenuBarWidget(isMenuOpen: isMenuOpen, textTheme: textTheme, sizeWidth: sizeWidth),
             Positioned(
               top: 0,
               left: 0,
@@ -193,133 +189,141 @@ class ExploreView extends ConsumerWidget {
                     color: AppColors.primary,
                     child: HolidayDealsWidget(textTheme: textTheme),
                   ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 800),
-                    margin: const EdgeInsets.only(right: 15),
-                    height: 100,
-                    color: containerColor,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width < 850
-                              ? 12
-                              : MediaQuery.of(context).size.width < 1210
-                                  ? 100
-                                  : 140),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            height: 60,
-                            child: Image.network(
-                                'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6711d4c2add268ab486ba5e2_Logo%20(7)-p-500.png'),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 800),
+                        margin: const EdgeInsets.only(right: 15),
+                        height: 100,
+                        color: containerColor,
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: MediaQuery.of(context).size.width < 850
+                                  ? 12
+                                  : MediaQuery.of(context).size.width < 1210
+                                      ? 100
+                                      : 140),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                height: 60,
+                                child: Image.network(
+                                    'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6711d4c2add268ab486ba5e2_Logo%20(7)-p-500.png'),
+                              ),
+                              const Expanded(child: SizedBox()),
+                              MediaQuery.of(context).size.width <= 1126
+                                  ? IconButton(
+                                      icon: AnimatedIcon(
+                                        icon: AnimatedIcons.menu_close,
+                                        progress:
+                                            isMenuOpen ? AlwaysStoppedAnimation(1.0) : AlwaysStoppedAnimation(0.0),
+                                      ),
+                                      onPressed: () => menuToggle.toggleMenu(),
+                                    )
+                                  : NavBarWidget(textTheme: textTheme),
+                              const SizedBox(
+                                width: 16,
+                              ),
+                              sizeWidth <= 1126
+                                  ? const SizedBox()
+                                  : ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.textSecondary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                      ),
+                                      onPressed: () async {
+                                        final FirebaseFirestore firestore = FirebaseFirestore.instance;
+                                        final CollectionReference exploreCollection = firestore.collection('explores');
+
+                                        const String chars =
+                                            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                                        final Random random = Random();
+                                        var id =
+                                            List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
+
+                                        // Sample data for 5 explores
+                                        final List<ExploreModel> explores = [
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'Explore the Mountains',
+                                            description: 'A thrilling experience in the mountains.',
+                                            location: 'Himalayas',
+                                            activity: 'Hiking',
+                                            userName: 'John Doe',
+                                            userImage: 'https://example.com/images/johndoe.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'City Lights Adventure',
+                                            description: 'Discover the beauty of urban landscapes.',
+                                            location: 'New York',
+                                            activity: 'City Tour',
+                                            userName: 'Jane Smith',
+                                            userImage: 'https://example.com/images/janesmith.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'Beach Bliss',
+                                            description: 'Relax at the serene beaches.',
+                                            location: 'Maldives',
+                                            activity: 'Beach Relaxation',
+                                            userName: 'Alex Johnson',
+                                            userImage: 'https://example.com/images/alexjohnson.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'Safari Adventure',
+                                            description: 'Experience the thrill of a safari.',
+                                            location: 'Africa',
+                                            activity: 'Safari',
+                                            userName: 'Chris Lee',
+                                            userImage: 'https://example.com/images/chrislee.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          // ExploreModel(
+                                          //   id: id,
+                                          //image: '',
+                                          //   title: 'Cultural Exploration',
+                                          //   description: 'Immerse yourself in local cultures.',
+                                          //   location: 'Japan',
+                                          //   activity: 'Cultural Tour',
+                                          //   userName: 'Emily Davis',
+                                          //   userImage: 'https://example.com/images/emilydavis.png',
+                                          //   createdAt: DateTime.now(),
+                                          // ),
+                                        ];
+
+                                        try {
+                                          // Add each explore to Firestore
+                                          for (var explore in explores) {
+                                            await exploreCollection.add(explore.toJson());
+                                          }
+                                          print('Explores added successfully!');
+                                        } catch (e) {
+                                          print('Error adding explores: $e');
+                                        }
+                                      },
+                                      child: Text(
+                                        'Get the BETA',
+                                        style: textTheme.bodyLarge?.copyWith(color: Colors.white),
+                                      )),
+                            ],
                           ),
-                          const Expanded(child: SizedBox()),
-                          MediaQuery.of(context).size.width <= 1126
-                              ? IconButton(
-                                  icon: AnimatedIcon(
-                                    icon: AnimatedIcons.menu_close,
-                                    progress: isMenuOpen ? AlwaysStoppedAnimation(1.0) : AlwaysStoppedAnimation(0.0),
-                                  ),
-                                  onPressed: () => menuToggle.toggleMenu(),
-                                )
-                              : NavBarWidget(textTheme: textTheme),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          sizeWidth <= 1126
-                              ? const SizedBox()
-                              : ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.textSecondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                                  ),
-                                  onPressed: () async {
-                                    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-                                    final CollectionReference exploreCollection = firestore.collection('explores');
-
-                                    const String chars =
-                                        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                                    final Random random = Random();
-                                    var id = List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
-
-                                    // Sample data for 5 explores
-                                    final List<ExploreModel> explores = [
-                                      ExploreModel(
-                                        id: id,
-                                        image: '',
-                                        title: 'Explore the Mountains',
-                                        description: 'A thrilling experience in the mountains.',
-                                        location: 'Himalayas',
-                                        activity: 'Hiking',
-                                        userName: 'John Doe',
-                                        userImage: 'https://example.com/images/johndoe.png',
-                                        createdAt: DateTime.now(),
-                                      ),
-                                      ExploreModel(
-                                        id: id,
-                                        image: '',
-                                        title: 'City Lights Adventure',
-                                        description: 'Discover the beauty of urban landscapes.',
-                                        location: 'New York',
-                                        activity: 'City Tour',
-                                        userName: 'Jane Smith',
-                                        userImage: 'https://example.com/images/janesmith.png',
-                                        createdAt: DateTime.now(),
-                                      ),
-                                      ExploreModel(
-                                        id: id,
-                                        image: '',
-                                        title: 'Beach Bliss',
-                                        description: 'Relax at the serene beaches.',
-                                        location: 'Maldives',
-                                        activity: 'Beach Relaxation',
-                                        userName: 'Alex Johnson',
-                                        userImage: 'https://example.com/images/alexjohnson.png',
-                                        createdAt: DateTime.now(),
-                                      ),
-                                      ExploreModel(
-                                        id: id,
-                                        image: '',
-                                        title: 'Safari Adventure',
-                                        description: 'Experience the thrill of a safari.',
-                                        location: 'Africa',
-                                        activity: 'Safari',
-                                        userName: 'Chris Lee',
-                                        userImage: 'https://example.com/images/chrislee.png',
-                                        createdAt: DateTime.now(),
-                                      ),
-                                      // ExploreModel(
-                                      //   id: id,
-                                      //image: '',
-                                      //   title: 'Cultural Exploration',
-                                      //   description: 'Immerse yourself in local cultures.',
-                                      //   location: 'Japan',
-                                      //   activity: 'Cultural Tour',
-                                      //   userName: 'Emily Davis',
-                                      //   userImage: 'https://example.com/images/emilydavis.png',
-                                      //   createdAt: DateTime.now(),
-                                      // ),
-                                    ];
-
-                                    try {
-                                      // Add each explore to Firestore
-                                      for (var explore in explores) {
-                                        await exploreCollection.add(explore.toJson());
-                                      }
-                                      print('Explores added successfully!');
-                                    } catch (e) {
-                                      print('Error adding explores: $e');
-                                    }
-                                  },
-                                  child: Text(
-                                    'Get the BETA',
-                                    style: textTheme.bodyLarge?.copyWith(color: Colors.white),
-                                  )),
-                        ],
+                        ),
                       ),
-                    ),
+                      MenuBarWidget(isMenuOpen: isMenuOpen, textTheme: textTheme, sizeWidth: sizeWidth),
+                    ],
                   ),
                 ],
               ),
