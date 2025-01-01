@@ -1,11 +1,12 @@
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/blog_view_model.dart';
 import 'package:booked_ai/view_models/explore_view_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class GridViewWidget extends ConsumerWidget {
-  const GridViewWidget({
+class BlogGridViewWidget extends ConsumerWidget {
+  const BlogGridViewWidget({
     super.key,
     required this.sizeWidth,
     required this.textTheme,
@@ -18,12 +19,12 @@ class GridViewWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final exploreViewModel = ref.watch(exploreViewModelProvider);
+    final blogViewModel = ref.watch(blogViewModelProvider);
 
-    return exploreViewModel.isLoading
+    return blogViewModel.isLoading
         ? const Center(child: CircularProgressIndicator())
-        : exploreViewModel.errorMessage != null
-            ? Center(child: Text('Error: ${exploreViewModel.errorMessage}'))
+        : blogViewModel.errorMessage != null
+            ? Center(child: Text('Error: ${blogViewModel.errorMessage}'))
             : GridView.builder(
                 key: PageStorageKey(storageKey),
                 shrinkWrap: true,
@@ -37,14 +38,14 @@ class GridViewWidget extends ConsumerWidget {
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 40,
                   childAspectRatio: sizeWidth < 768
-                      ? 0.73
+                      ? 0.94
                       : sizeWidth > 768 && sizeWidth <= 1000
-                          ? 0.63
-                          : 0.64,
+                          ? 0.8
+                          : 0.7,
                 ),
-                itemCount: exploreViewModel.exploreList.length,
+                itemCount: blogViewModel.blogs.length,
                 itemBuilder: (context, index) {
-                  final explore = exploreViewModel.exploreList[index];
+                  final explore = blogViewModel.blogs[index];
                   return Card(
                     key: ValueKey(index),
                     color: Colors.white,
@@ -61,13 +62,14 @@ class GridViewWidget extends ConsumerWidget {
                           const SizedBox(
                             height: 22,
                           ),
-                          CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: explore.image,
-                            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                            errorWidget: (context, url, error) => Image.network(
-                                width: sizeWidth,
-                                'https://media.istockphoto.com/id/1409329028/vector/no-picture-available-placeholder-thumbnail-icon-illustration-design.jpg?s=612x612&w=0&k=20&c=_zOuJu755g2eEUioiOUdz_mHKJQJn-tDgIAhQzyeKUQ='),
+                          AspectRatio(
+                            aspectRatio: 4 / 3,
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: explore.image,
+                              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) => const Icon(Icons.error),
+                            ),
                           ),
                           Expanded(
                             child: Column(
@@ -114,50 +116,9 @@ class GridViewWidget extends ConsumerWidget {
                                     ],
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.location_on, color: Colors.grey, size: 26),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      explore.location,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
+                                SizedBox(
+                                  height: 2,
                                 ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.card_giftcard, color: Colors.grey, size: 26),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      explore.activity,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  leading: CircleAvatar(
-                                    radius: 15,
-                                    backgroundImage: NetworkImage(explore.userImage),
-                                  ),
-                                  title: Text(
-                                    explore.userName,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  subtitle: const Text('3 min read'),
-                                )
                               ],
                             ),
                           ),

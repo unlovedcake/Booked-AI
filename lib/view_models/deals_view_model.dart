@@ -60,6 +60,7 @@ class DealsViewModelNotifier extends ChangeNotifier {
   ScrollController get controller => scrollController!;
 
   DealsViewModelNotifier(this._repository) {
+    //addDeal();
     fetchDeals();
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
@@ -85,6 +86,47 @@ class DealsViewModelNotifier extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> addDeal() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _firestore.collection('deals').add({
+        'title': 'Cheapest Flights to Dubai',
+        'description':
+            'Explore Dubai with travel AI deals on cheap flights. Save more on your next adventure using an AI travel agent.',
+        'createdAt': DateTime.now(),
+        'dealsDetails': [
+          {
+            'from': 'New York',
+            'to': 'Dubai',
+            'name': 'Emirates',
+            'type': 'Economy Round Trip',
+            'price': 799,
+            'dateAvailable': DateTime.now(),
+          },
+          {
+            'from': 'Doha',
+            'to': 'Dubai',
+            'name': 'Emirates',
+            'type': 'Economy Round Trip',
+            'price': 179,
+            'dateAvailable': DateTime.now(),
+          }
+        ],
+      });
+
+      print('Deal Added Successfully');
+
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to add deal: $e';
+      notifyListeners();
+    } finally {
+      _isLoading = false;
     }
   }
 

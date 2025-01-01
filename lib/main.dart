@@ -49,7 +49,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goRouter = ref.watch(appRouter);
+    //final goRouter = ref.watch(appRouter);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
 
@@ -58,7 +58,7 @@ class MyApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      routerConfig: goRouter,
+      routerConfig: appRouter,
       // routerDelegate: goRouter.routerDelegate,
       // routeInformationParser: goRouter.routeInformationParser,
       // routeInformationProvider: goRouter.routeInformationProvider,

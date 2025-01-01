@@ -1,7 +1,9 @@
 import 'package:booked_ai/main.dart';
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/blog_view_model.dart';
 import 'package:booked_ai/view_models/deals_view_model.dart';
 import 'package:booked_ai/view_models/explore_view_model.dart';
+import 'package:booked_ai/view_models/partner_with_us_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,6 +26,8 @@ class NavBarWidget extends ConsumerWidget {
         //final _currentIndexNavBar = ref.watch(currentIndexNavBar);
         final exploreViewModel = ref.watch(exploreViewModelProvider);
         final dealsViewModel = ref.watch(dealsViewModelProvider);
+        final blogViewModel = ref.watch(blogViewModelProvider);
+        final partnerWithUsViewModel = ref.watch(partnerWithUsViewModelProvider);
 
         return InkWell(
           onHover: (isHovering) {
@@ -52,15 +56,29 @@ class NavBarWidget extends ConsumerWidget {
 
                   switch (index) {
                     case 0:
-                      dealsViewModel.scrolPos();
+                      exploreViewModel.scrolPos();
 
                       context.go('/explore');
 
                       break;
                     case 1:
-                      exploreViewModel.scrolPos();
+                      dealsViewModel.scrolPos();
 
                       context.go('/deals');
+
+                      break;
+
+                    case 2:
+                      blogViewModel.scrolPos();
+
+                      context.go('/blog');
+
+                      break;
+
+                    case 3:
+                      partnerWithUsViewModel.scrolPos();
+
+                      context.go('/partner-with-us');
 
                       break;
                   }

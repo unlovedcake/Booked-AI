@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:booked_ai/models/explore_model.dart';
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/blog_view_model.dart';
+import 'package:booked_ai/views/blog/blog_grid_view_widget.dart';
 import 'package:booked_ai/views/explore/footer_widget.dart';
 import 'package:booked_ai/views/explore/grid_view_widget.dart';
 import 'package:booked_ai/views/explore/header_widget.dart';
@@ -12,12 +14,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../view_models/explore_view_model.dart';
 
-class ExploreView extends ConsumerWidget {
-  const ExploreView({super.key});
+class BlogView extends ConsumerWidget {
+  const BlogView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,14 +28,16 @@ class ExploreView extends ConsumerWidget {
     print('Screen Width $sizeWidth');
 
     final textTheme = Theme.of(context).textTheme;
-    final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
-    final scrollController = scrollControllerNotifiers.controller;
-    final isScrollingReachTheTop = scrollControllerNotifiers.hasReachedTop;
 
-    var isMenuOpen = scrollControllerNotifiers.isToggleMenu;
-    var isGetTheBeta = scrollControllerNotifiers.isToggleGetBeta;
+    final blogViewModel = ref.watch(blogViewModelProvider);
+    final scrollController = blogViewModel.controller;
+    final isScrollingReachTheTop = blogViewModel.hasReachedTop;
 
-    scrollControllerNotifiers.setCurrentIndexNavBar(0);
+    final exploreViewModel = ref.watch(exploreViewModelProvider);
+
+    exploreViewModel.setCurrentIndexNavBar(2);
+
+    var isMenuOpen = exploreViewModel.isToggleMenu;
 
     final menuToggle = ref.read(exploreViewModelProvider.notifier);
 
@@ -41,9 +45,6 @@ class ExploreView extends ConsumerWidget {
 
     if (sizeWidth > 1126 && isMenuOpen) {
       isMenuOpen = false;
-    }
-    if (sizeWidth <= 1212 && isGetTheBeta) {
-      isGetTheBeta = false;
     }
 
     return Scaffold(
@@ -63,8 +64,8 @@ class ExploreView extends ConsumerWidget {
                     HeaderWidget(
                       textTheme: textTheme,
                       heightOfContainer: 445,
-                      title: 'Explore',
-                      description: 'Learn about newest travel trends and amazing places to visit!',
+                      title: 'Blogs',
+                      description: 'The latest travel industry news, articles, videos and resources',
                     ),
                     Transform.translate(
                         offset: const Offset(0, -56),
@@ -82,10 +83,10 @@ class ExploreView extends ConsumerWidget {
                                   : 140),
                       child: Transform.translate(
                         offset: const Offset(0, -116),
-                        child: GridViewWidget(
+                        child: BlogGridViewWidget(
                           sizeWidth: sizeWidth,
                           textTheme: textTheme,
-                          storageKey: 'explore',
+                          storageKey: 'blog',
                         ),
                       ),
                     ),
@@ -240,85 +241,83 @@ class ExploreView extends ConsumerWidget {
                                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                       ),
                                       onPressed: () async {
-                                        // final FirebaseFirestore firestore = FirebaseFirestore.instance;
-                                        // final CollectionReference exploreCollection = firestore.collection('explores');
+                                        final FirebaseFirestore firestore = FirebaseFirestore.instance;
+                                        final CollectionReference exploreCollection = firestore.collection('explores');
 
-                                        // const String chars =
-                                        //     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                                        // final Random random = Random();
-                                        // var id =
-                                        //     List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
+                                        const String chars =
+                                            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                                        final Random random = Random();
+                                        var id =
+                                            List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
 
-                                        // // Sample data for 5 explores
-                                        // final List<ExploreModel> explores = [
-                                        //   ExploreModel(
-                                        //     id: id,
-                                        //     image: '',
-                                        //     title: 'Explore the Mountains',
-                                        //     description: 'A thrilling experience in the mountains.',
-                                        //     location: 'Himalayas',
-                                        //     activity: 'Hiking',
-                                        //     userName: 'John Doe',
-                                        //     userImage: 'https://example.com/images/johndoe.png',
-                                        //     createdAt: DateTime.now(),
-                                        //   ),
-                                        //   ExploreModel(
-                                        //     id: id,
-                                        //     image: '',
-                                        //     title: 'City Lights Adventure',
-                                        //     description: 'Discover the beauty of urban landscapes.',
-                                        //     location: 'New York',
-                                        //     activity: 'City Tour',
-                                        //     userName: 'Jane Smith',
-                                        //     userImage: 'https://example.com/images/janesmith.png',
-                                        //     createdAt: DateTime.now(),
-                                        //   ),
-                                        //   ExploreModel(
-                                        //     id: id,
-                                        //     image: '',
-                                        //     title: 'Beach Bliss',
-                                        //     description: 'Relax at the serene beaches.',
-                                        //     location: 'Maldives',
-                                        //     activity: 'Beach Relaxation',
-                                        //     userName: 'Alex Johnson',
-                                        //     userImage: 'https://example.com/images/alexjohnson.png',
-                                        //     createdAt: DateTime.now(),
-                                        //   ),
-                                        //   ExploreModel(
-                                        //     id: id,
-                                        //     image: '',
-                                        //     title: 'Safari Adventure',
-                                        //     description: 'Experience the thrill of a safari.',
-                                        //     location: 'Africa',
-                                        //     activity: 'Safari',
-                                        //     userName: 'Chris Lee',
-                                        //     userImage: 'https://example.com/images/chrislee.png',
-                                        //     createdAt: DateTime.now(),
-                                        //   ),
-                                        //   // ExploreModel(
-                                        //   //   id: id,
-                                        //   //image: '',
-                                        //   //   title: 'Cultural Exploration',
-                                        //   //   description: 'Immerse yourself in local cultures.',
-                                        //   //   location: 'Japan',
-                                        //   //   activity: 'Cultural Tour',
-                                        //   //   userName: 'Emily Davis',
-                                        //   //   userImage: 'https://example.com/images/emilydavis.png',
-                                        //   //   createdAt: DateTime.now(),
-                                        //   // ),
-                                        // ];
+                                        // Sample data for 5 explores
+                                        final List<ExploreModel> explores = [
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'Explore the Mountains',
+                                            description: 'A thrilling experience in the mountains.',
+                                            location: 'Himalayas',
+                                            activity: 'Hiking',
+                                            userName: 'John Doe',
+                                            userImage: 'https://example.com/images/johndoe.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'City Lights Adventure',
+                                            description: 'Discover the beauty of urban landscapes.',
+                                            location: 'New York',
+                                            activity: 'City Tour',
+                                            userName: 'Jane Smith',
+                                            userImage: 'https://example.com/images/janesmith.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'Beach Bliss',
+                                            description: 'Relax at the serene beaches.',
+                                            location: 'Maldives',
+                                            activity: 'Beach Relaxation',
+                                            userName: 'Alex Johnson',
+                                            userImage: 'https://example.com/images/alexjohnson.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          ExploreModel(
+                                            id: id,
+                                            image: '',
+                                            title: 'Safari Adventure',
+                                            description: 'Experience the thrill of a safari.',
+                                            location: 'Africa',
+                                            activity: 'Safari',
+                                            userName: 'Chris Lee',
+                                            userImage: 'https://example.com/images/chrislee.png',
+                                            createdAt: DateTime.now(),
+                                          ),
+                                          // ExploreModel(
+                                          //   id: id,
+                                          //image: '',
+                                          //   title: 'Cultural Exploration',
+                                          //   description: 'Immerse yourself in local cultures.',
+                                          //   location: 'Japan',
+                                          //   activity: 'Cultural Tour',
+                                          //   userName: 'Emily Davis',
+                                          //   userImage: 'https://example.com/images/emilydavis.png',
+                                          //   createdAt: DateTime.now(),
+                                          // ),
+                                        ];
 
-                                        // try {
-                                        //   // Add each explore to Firestore
-                                        //   for (var explore in explores) {
-                                        //     await exploreCollection.add(explore.toJson());
-                                        //   }
-                                        //   print('Explores added successfully!');
-                                        // } catch (e) {
-                                        //   print('Error adding explores: $e');
-                                        // }
-
-                                        ref.read(exploreViewModelProvider.notifier).toggleGetBeta();
+                                        try {
+                                          // Add each explore to Firestore
+                                          for (var explore in explores) {
+                                            await exploreCollection.add(explore.toJson());
+                                          }
+                                          print('Explores added successfully!');
+                                        } catch (e) {
+                                          print('Error adding explores: $e');
+                                        }
                                       },
                                       child: Text(
                                         'Get the BETA',
@@ -334,46 +333,6 @@ class ExploreView extends ConsumerWidget {
                 ],
               ),
             ),
-            Positioned(
-              top: 115,
-              right: 154,
-              child: isGetTheBeta
-                  ? Container(
-                      color: Colors.white,
-                      height: 100,
-                      width: 140,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                                onPressed: () async {
-                                  final Uri url = Uri.parse('https://apps.apple.com/au/app/booked-ai/id6473001180');
-                                  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                child: Text(
-                                  'IOS',
-                                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
-                                )),
-                            TextButton(
-                                onPressed: () async {
-                                  final Uri url = Uri.parse('https://apps.apple.com/au/app/booked-ai/id6473001180');
-                                  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                                    throw 'Could not launch $url';
-                                  }
-                                },
-                                child:
-                                    Text('Android', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700))),
-                          ],
-                        ),
-                      ),
-                    )
-                  : SizedBox(),
-            )
           ],
         ),
       ),

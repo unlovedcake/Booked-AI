@@ -39,6 +39,8 @@ class ExploreViewModelNotifier extends ChangeNotifier {
   bool hasReachedTop = true;
   bool isToggleMenu = false;
 
+  bool isToggleGetBeta = false;
+
   double initialScrollOffset = 0.0;
 
   int _currentIndexNavBar = 0;
@@ -114,8 +116,12 @@ class ExploreViewModelNotifier extends ChangeNotifier {
   }
 
   void toggleMenu() {
-    print('Toggle');
     isToggleMenu = !isToggleMenu;
+    notifyListeners();
+  }
+
+  void toggleGetBeta() {
+    isToggleGetBeta = !isToggleGetBeta;
     notifyListeners();
   }
 

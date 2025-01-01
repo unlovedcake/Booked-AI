@@ -3,6 +3,8 @@ import 'package:booked_ai/views/explore/navbar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../view_models/explore_view_model.dart';
 
@@ -16,6 +18,13 @@ class FooterWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final socialMediaIcon = [
+      FontAwesomeIcons.tiktok,
+      FontAwesomeIcons.facebook,
+      FontAwesomeIcons.instagram,
+      FontAwesomeIcons.linkedin,
+    ];
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(right: 15),
@@ -48,7 +57,7 @@ class FooterWidget extends ConsumerWidget {
                   alignment: Alignment.center,
                   child: Wrap(
                       spacing: 30,
-                      children: List.generate(4, (index) {
+                      children: List.generate(socialMediaIcon.length, (index) {
                         final _currentIndexSocialMedia = ref.watch(currentIndexSocialMedia);
                         return InkWell(
                           onHover: (isHovering) {
@@ -58,9 +67,31 @@ class FooterWidget extends ConsumerWidget {
                               ref.read(currentIndexSocialMedia.notifier).state = null;
                             }
                           },
-                          onTap: () {},
+                          onTap: () async {
+                            String urlLink = '';
+
+                            switch (index) {
+                              case 0:
+                                urlLink = 'https://www.tiktok.com/@booked.ai';
+                                break;
+                              case 1:
+                                urlLink = 'https://www.facebook.com/people/Booked-AI/61550739839831/';
+                                break;
+                              case 2:
+                                urlLink = 'https://www.instagram.com/booked.ai/';
+                                break;
+
+                              default:
+                                urlLink = 'https://www.linkedin.com/company/booked-ai/';
+                            }
+
+                            final Uri url = Uri.parse(urlLink);
+                            if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                              throw 'Could not launch $url';
+                            }
+                          },
                           child: Icon(
-                            Icons.facebook,
+                            socialMediaIcon[index],
                             color: _currentIndexSocialMedia == index ? Colors.white : Colors.grey,
                           ),
                         );

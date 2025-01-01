@@ -1,6 +1,8 @@
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/blog_view_model.dart';
 import 'package:booked_ai/view_models/deals_view_model.dart';
 import 'package:booked_ai/view_models/explore_view_model.dart';
+import 'package:booked_ai/view_models/partner_with_us_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,6 +45,8 @@ class MenuBarWidget extends ConsumerWidget {
                 //final _currentIndexNavBar = ref.watch(currentIndexNavBar);
                 final exploreViewModel = ref.watch(exploreViewModelProvider);
                 final dealsViewModel = ref.watch(dealsViewModelProvider);
+                final blogViewModel = ref.watch(blogViewModelProvider);
+                final partnerWithUsViewModel = ref.watch(partnerWithUsViewModelProvider);
 
                 return InkWell(
                   onHover: (isHovering) {
@@ -85,6 +89,19 @@ class MenuBarWidget extends ConsumerWidget {
                               context.go('/deals');
 
                               break;
+                            case 2:
+                              blogViewModel.scrolPos();
+                              exploreViewModel.isToggleMenu = false;
+                              context.go('/blog');
+
+                              break;
+
+                            case 3:
+                              partnerWithUsViewModel.scrolPos();
+                              exploreViewModel.isToggleMenu = false;
+                              context.go('/partner-with-us');
+
+                              break;
                           }
                         },
                         child: Text(navBarTitles[index]['title'] ?? '',
@@ -113,7 +130,10 @@ class MenuBarWidget extends ConsumerWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    ref.read(exploreViewModelProvider.notifier).toggleGetBeta();
+                    print('Button Get the Beta Click');
+                  },
                   child: Text(
                     'Get the BETA',
                     style: textTheme.bodyLarge?.copyWith(color: Colors.white),

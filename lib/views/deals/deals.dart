@@ -384,15 +384,17 @@ class ListViewDealsWidgetMobile extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          deal.title,
-                          style: textTheme.bodyLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.w500),
+                        Container(
+                          child: Text(
+                            deal.title,
+                            style: textTheme.bodyLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.w500),
+                          ),
                         ),
                         const SizedBox(
                           height: 20,
                         ),
                         Container(
-                          width: sizeWidth * 0.4,
+                          width: sizeWidth <= 850 ? sizeWidth : sizeWidth * 0.6,
                           child: Text(maxLines: 4, deal.description),
                         ),
                         const SizedBox(
