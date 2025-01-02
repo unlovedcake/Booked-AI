@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../view_models/explore_view_model.dart';
 
@@ -35,6 +36,8 @@ class BlogView extends ConsumerWidget {
 
     final exploreViewModel = ref.watch(exploreViewModelProvider);
 
+    var isGetTheBeta = exploreViewModel.isToggleGetBeta;
+
     exploreViewModel.setCurrentIndexNavBar(2);
 
     var isMenuOpen = exploreViewModel.isToggleMenu;
@@ -45,6 +48,9 @@ class BlogView extends ConsumerWidget {
 
     if (sizeWidth > 1126 && isMenuOpen) {
       isMenuOpen = false;
+    }
+    if (sizeWidth <= 1126 && isGetTheBeta) {
+      isGetTheBeta = false;
     }
 
     return Scaffold(
@@ -241,83 +247,84 @@ class BlogView extends ConsumerWidget {
                                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                       ),
                                       onPressed: () async {
-                                        final FirebaseFirestore firestore = FirebaseFirestore.instance;
-                                        final CollectionReference exploreCollection = firestore.collection('explores');
+                                        ref.read(exploreViewModelProvider.notifier).toggleGetBeta();
+                                        // final FirebaseFirestore firestore = FirebaseFirestore.instance;
+                                        // final CollectionReference exploreCollection = firestore.collection('explores');
 
-                                        const String chars =
-                                            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                                        final Random random = Random();
-                                        var id =
-                                            List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
+                                        // const String chars =
+                                        //     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                                        // final Random random = Random();
+                                        // var id =
+                                        //     List.generate(20, (index) => chars[random.nextInt(chars.length)]).join();
 
-                                        // Sample data for 5 explores
-                                        final List<ExploreModel> explores = [
-                                          ExploreModel(
-                                            id: id,
-                                            image: '',
-                                            title: 'Explore the Mountains',
-                                            description: 'A thrilling experience in the mountains.',
-                                            location: 'Himalayas',
-                                            activity: 'Hiking',
-                                            userName: 'John Doe',
-                                            userImage: 'https://example.com/images/johndoe.png',
-                                            createdAt: DateTime.now(),
-                                          ),
-                                          ExploreModel(
-                                            id: id,
-                                            image: '',
-                                            title: 'City Lights Adventure',
-                                            description: 'Discover the beauty of urban landscapes.',
-                                            location: 'New York',
-                                            activity: 'City Tour',
-                                            userName: 'Jane Smith',
-                                            userImage: 'https://example.com/images/janesmith.png',
-                                            createdAt: DateTime.now(),
-                                          ),
-                                          ExploreModel(
-                                            id: id,
-                                            image: '',
-                                            title: 'Beach Bliss',
-                                            description: 'Relax at the serene beaches.',
-                                            location: 'Maldives',
-                                            activity: 'Beach Relaxation',
-                                            userName: 'Alex Johnson',
-                                            userImage: 'https://example.com/images/alexjohnson.png',
-                                            createdAt: DateTime.now(),
-                                          ),
-                                          ExploreModel(
-                                            id: id,
-                                            image: '',
-                                            title: 'Safari Adventure',
-                                            description: 'Experience the thrill of a safari.',
-                                            location: 'Africa',
-                                            activity: 'Safari',
-                                            userName: 'Chris Lee',
-                                            userImage: 'https://example.com/images/chrislee.png',
-                                            createdAt: DateTime.now(),
-                                          ),
-                                          // ExploreModel(
-                                          //   id: id,
-                                          //image: '',
-                                          //   title: 'Cultural Exploration',
-                                          //   description: 'Immerse yourself in local cultures.',
-                                          //   location: 'Japan',
-                                          //   activity: 'Cultural Tour',
-                                          //   userName: 'Emily Davis',
-                                          //   userImage: 'https://example.com/images/emilydavis.png',
-                                          //   createdAt: DateTime.now(),
-                                          // ),
-                                        ];
+                                        // // Sample data for 5 explores
+                                        // final List<ExploreModel> explores = [
+                                        //   ExploreModel(
+                                        //     id: id,
+                                        //     image: '',
+                                        //     title: 'Explore the Mountains',
+                                        //     description: 'A thrilling experience in the mountains.',
+                                        //     location: 'Himalayas',
+                                        //     activity: 'Hiking',
+                                        //     userName: 'John Doe',
+                                        //     userImage: 'https://example.com/images/johndoe.png',
+                                        //     createdAt: DateTime.now(),
+                                        //   ),
+                                        //   ExploreModel(
+                                        //     id: id,
+                                        //     image: '',
+                                        //     title: 'City Lights Adventure',
+                                        //     description: 'Discover the beauty of urban landscapes.',
+                                        //     location: 'New York',
+                                        //     activity: 'City Tour',
+                                        //     userName: 'Jane Smith',
+                                        //     userImage: 'https://example.com/images/janesmith.png',
+                                        //     createdAt: DateTime.now(),
+                                        //   ),
+                                        //   ExploreModel(
+                                        //     id: id,
+                                        //     image: '',
+                                        //     title: 'Beach Bliss',
+                                        //     description: 'Relax at the serene beaches.',
+                                        //     location: 'Maldives',
+                                        //     activity: 'Beach Relaxation',
+                                        //     userName: 'Alex Johnson',
+                                        //     userImage: 'https://example.com/images/alexjohnson.png',
+                                        //     createdAt: DateTime.now(),
+                                        //   ),
+                                        //   ExploreModel(
+                                        //     id: id,
+                                        //     image: '',
+                                        //     title: 'Safari Adventure',
+                                        //     description: 'Experience the thrill of a safari.',
+                                        //     location: 'Africa',
+                                        //     activity: 'Safari',
+                                        //     userName: 'Chris Lee',
+                                        //     userImage: 'https://example.com/images/chrislee.png',
+                                        //     createdAt: DateTime.now(),
+                                        //   ),
+                                        //   // ExploreModel(
+                                        //   //   id: id,
+                                        //   //image: '',
+                                        //   //   title: 'Cultural Exploration',
+                                        //   //   description: 'Immerse yourself in local cultures.',
+                                        //   //   location: 'Japan',
+                                        //   //   activity: 'Cultural Tour',
+                                        //   //   userName: 'Emily Davis',
+                                        //   //   userImage: 'https://example.com/images/emilydavis.png',
+                                        //   //   createdAt: DateTime.now(),
+                                        //   // ),
+                                        // ];
 
-                                        try {
-                                          // Add each explore to Firestore
-                                          for (var explore in explores) {
-                                            await exploreCollection.add(explore.toJson());
-                                          }
-                                          print('Explores added successfully!');
-                                        } catch (e) {
-                                          print('Error adding explores: $e');
-                                        }
+                                        // try {
+                                        //   // Add each explore to Firestore
+                                        //   for (var explore in explores) {
+                                        //     await exploreCollection.add(explore.toJson());
+                                        //   }
+                                        //   print('Explores added successfully!');
+                                        // } catch (e) {
+                                        //   print('Error adding explores: $e');
+                                        // }
                                       },
                                       child: Text(
                                         'Get the BETA',
@@ -333,6 +340,48 @@ class BlogView extends ConsumerWidget {
                 ],
               ),
             ),
+            Positioned(
+              top: 115,
+              right: sizeWidth <= 1210 ? 116 : 154,
+              child: isGetTheBeta
+                  ? AnimatedContainer(
+                      color: Colors.white,
+                      duration: Duration(milliseconds: 800),
+                      curve: Curves.linear,
+                      height: 100,
+                      width: 140,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                                onPressed: () async {
+                                  final Uri url = Uri.parse('https://apps.apple.com/au/app/booked-ai/id6473001180');
+                                  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child: Text(
+                                  'IOS',
+                                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                                )),
+                            TextButton(
+                                onPressed: () async {
+                                  final Uri url = Uri.parse('https://apps.apple.com/au/app/booked-ai/id6473001180');
+                                  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child:
+                                    Text('Android', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700))),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SizedBox(),
+            )
           ],
         ),
       ),

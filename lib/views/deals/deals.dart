@@ -16,6 +16,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DealsView extends ConsumerWidget {
   const DealsView({super.key});
@@ -27,11 +28,14 @@ class DealsView extends ConsumerWidget {
     print('Screen Width $sizeWidth');
 
     final textTheme = Theme.of(context).textTheme;
+
     final dealsViewModel = ref.watch(dealsViewModelProvider);
     final scrollController = dealsViewModel.controller;
     final isScrollingReachTheTop = dealsViewModel.hasReachedTop;
 
     final exploreViewModel = ref.watch(exploreViewModelProvider);
+
+    var isGetTheBeta = exploreViewModel.isToggleGetBeta;
 
     exploreViewModel.setCurrentIndexNavBar(1);
 
@@ -39,13 +43,9 @@ class DealsView extends ConsumerWidget {
 
     Color containerColor = isScrollingReachTheTop ? Colors.transparent : Colors.white;
 
-    // final urlPage = ref.watch(currentPageProvider);
-    // final url = GoRouter.of(context).state!.matchedLocation;
-
-    // if (url == '/deals') {
-    //   ref.read(exploreViewModelNotifier).setCurrentIndexNavBar(1);
-    // }
-
+    if (sizeWidth <= 1126 && isGetTheBeta) {
+      isGetTheBeta = false;
+    }
     if (sizeWidth > 1126 && isMenuOpen) {
       isMenuOpen = false;
     }
@@ -308,7 +308,9 @@ class DealsView extends ConsumerWidget {
                                         ),
                                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        ref.read(exploreViewModelProvider.notifier).toggleGetBeta();
+                                      },
                                       child: Text(
                                         'Get the BETA',
                                         style: textTheme.bodyLarge?.copyWith(color: Colors.white),
@@ -323,6 +325,48 @@ class DealsView extends ConsumerWidget {
                 ],
               ),
             ),
+            Positioned(
+              top: 115,
+              right: sizeWidth <= 1210 ? 116 : 154,
+              child: isGetTheBeta
+                  ? AnimatedContainer(
+                      color: Colors.white,
+                      duration: Duration(milliseconds: 800),
+                      curve: Curves.linear,
+                      height: 100,
+                      width: 140,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                                onPressed: () async {
+                                  final Uri url = Uri.parse('https://apps.apple.com/au/app/booked-ai/id6473001180');
+                                  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child: Text(
+                                  'IOS',
+                                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                                )),
+                            TextButton(
+                                onPressed: () async {
+                                  final Uri url = Uri.parse('https://apps.apple.com/au/app/booked-ai/id6473001180');
+                                  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                    throw 'Could not launch $url';
+                                  }
+                                },
+                                child:
+                                    Text('Android', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700))),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SizedBox(),
+            )
           ],
         ),
       ),

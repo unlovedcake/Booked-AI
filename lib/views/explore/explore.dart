@@ -42,7 +42,7 @@ class ExploreView extends ConsumerWidget {
     if (sizeWidth > 1126 && isMenuOpen) {
       isMenuOpen = false;
     }
-    if (sizeWidth <= 1212 && isGetTheBeta) {
+    if (sizeWidth <= 1126 && isGetTheBeta) {
       isGetTheBeta = false;
     }
 
@@ -180,6 +180,9 @@ class ExploreView extends ConsumerWidget {
                 ),
               ),
             ),
+
+            //Navbar
+
             Positioned(
               top: 0,
               left: 0,
@@ -336,10 +339,12 @@ class ExploreView extends ConsumerWidget {
             ),
             Positioned(
               top: 115,
-              right: 154,
+              right: sizeWidth <= 1210 ? 116 : 154,
               child: isGetTheBeta
-                  ? Container(
+                  ? AnimatedContainer(
                       color: Colors.white,
+                      duration: Duration(milliseconds: 800),
+                      curve: Curves.linear,
                       height: 100,
                       width: 140,
                       child: Padding(
