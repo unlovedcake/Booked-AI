@@ -51,7 +51,7 @@ class NavBarWidget extends ConsumerWidget {
             child: TextButton(
                 onPressed: () {
                   ref.read(exploreViewModelProvider).setCurrentIndexNavBar(index);
-                  //ref.read(currentIndexNavBar.notifier).state = index;
+
                   ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[0]['isHovering'] = 'No';
 
                   switch (index) {
@@ -94,53 +94,5 @@ class NavBarWidget extends ConsumerWidget {
         );
       }),
     );
-
-    // Wrap(
-    //   alignment: WrapAlignment.center,
-    //   crossAxisAlignment: WrapCrossAlignment.center,
-    //   spacing: 10,
-    //   children: List.generate(ref.watch(exploreNavBarTitleProvider).length, (index) {
-    //     final navBarTitles = ref.watch(exploreNavBarTitleProvider);
-    //     var hoveringValue = ref.watch(isHoveringTheNavBar);
-    //     final _currentIndexNavBar = ref.watch(currentIndexNavBar);
-
-    //     return InkWell(
-    //       onHover: (isHovering) {
-    //         if (isHovering) {
-    //           ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[index]['isHovering'] = 'Yes';
-
-    //           print('navBarTitles $navBarTitles');
-    //         } else {
-    //           ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[index]['isHovering'] = 'No';
-    //           print('navBarTitles $navBarTitles');
-    //         }
-    //       },
-    //       onTap: () {},
-    //       child: AnimatedContainer(
-    //         duration: const Duration(milliseconds: 300),
-    //         decoration: BoxDecoration(
-    //           color: _currentIndexNavBar == index
-    //               ? Colors.transparent
-    //               : navBarTitles[index]['isHovering'] == 'Yes'
-    //                   ? Colors.white10
-    //                   : Colors.transparent,
-    //           borderRadius: BorderRadius.circular(20.0),
-    //         ),
-    //         child: TextButton(
-    //             onPressed: () {
-    //               ref.read(currentIndexNavBar.notifier).state = index;
-    //               ref.read(isHoveringTheNavBar.notifier).state = navBarTitles[0]['isHovering'] = 'No';
-    //             },
-    //             child: Text(navBarTitles[index]['title'] ?? '',
-    //                 style: textTheme.bodyLarge?.copyWith(
-    //                   fontWeight: FontWeight.w400,
-    //                   color: _currentIndexNavBar == index || navBarTitles[index]['isHovering'] == 'Yes'
-    //                       ? AppColors.textSecondary
-    //                       : Colors.grey.shade600,
-    //                 ))),
-    //       ),
-    //     );
-    //   }),
-    // );
   }
 }

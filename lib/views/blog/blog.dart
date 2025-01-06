@@ -4,6 +4,7 @@ import 'package:booked_ai/models/explore_model.dart';
 import 'package:booked_ai/themes/app_colors.dart';
 import 'package:booked_ai/view_models/blog_view_model.dart';
 import 'package:booked_ai/views/blog/blog_grid_view_widget.dart';
+import 'package:booked_ai/views/explore/app_logo_widget.dart';
 import 'package:booked_ai/views/explore/footer_widget.dart';
 import 'package:booked_ai/views/explore/grid_view_widget.dart';
 import 'package:booked_ai/views/explore/header_widget.dart';
@@ -217,11 +218,7 @@ class BlogView extends ConsumerWidget {
                                       : 140),
                           child: Row(
                             children: [
-                              SizedBox(
-                                height: 60,
-                                child: Image.network(
-                                    'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6711d4c2add268ab486ba5e2_Logo%20(7)-p-500.png'),
-                              ),
+                              const AppLogoWidget(),
                               const Expanded(child: SizedBox()),
                               MediaQuery.of(context).size.width <= 1126
                                   ? IconButton(

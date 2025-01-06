@@ -36,7 +36,8 @@ class BlogViewModelNotifier extends ChangeNotifier {
     scrollController!.addListener(_onScroll);
   }
 
-  void disposeController() {
+  @override
+  void dispose() {
     scrollController!.removeListener(_onScroll);
     scrollController!.dispose();
     super.dispose();

@@ -38,10 +38,10 @@ class BlogGridViewWidget extends ConsumerWidget {
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 40,
                   childAspectRatio: sizeWidth < 768
-                      ? 0.94
+                      ? 0.93
                       : sizeWidth > 768 && sizeWidth <= 1000
                           ? 0.8
-                          : 0.7,
+                          : 0.68,
                 ),
                 itemCount: blogViewModel.blogs.length,
                 itemBuilder: (context, index) {

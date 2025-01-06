@@ -63,8 +63,8 @@ class PartnerWithUsViewModelNotifier extends ChangeNotifier {
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
   }
-
-  void disposeController() {
+  @override
+  void dispose() {
     scrollController!.removeListener(_onScroll);
     scrollController!.dispose();
     super.dispose();
@@ -126,47 +126,3 @@ final partnerWithUsViewModelProvider = ChangeNotifierProvider<PartnerWithUsViewM
 
   return PartnerWithUsViewModelNotifier(repository);
 });
-
-final scrollControllerProvider = Provider<ScrollController>((ref) {
-  return ScrollController();
-});
-
-// Timer Provider
-
-// Timer Provider for continuous scrolling
-final autoScrollProvider = Provider<Timer?>((ref) {
-  ScrollController controller = ref.read(scrollControllerProvider);
-
-  return Timer.periodic(Duration(milliseconds: 16), (timer) {
-    if (controller.hasClients) {
-      double maxScroll = controller.position.maxScrollExtent;
-
-      if (controller.offset >= maxScroll) {
-        controller.jumpTo(0); // Seamlessly jump to the start without a glitch
-      } else {
-        controller.jumpTo(controller.offset + 10.0); // Scroll by 2 pixels
-      }
-    }
-  });
-});
-// final autoScrollProvider = Provider<Timer?>((ref) {
-//   ScrollController controller = ref.read(scrollControllerProvider);
-
-//   return Timer.periodic(Duration(milliseconds: 50), (timer) {
-//     if (controller.hasClients) {
-//       double maxScroll = controller.position.maxScrollExtent;
-//       double currentScroll = controller.offset;
-
-//       // Auto-scroll logic
-//       if (currentScroll >= maxScroll) {
-//         controller.jumpTo(0); // Reset to the beginning
-//       } else {
-//         controller.animateTo(
-//           currentScroll + 10.0, // Scroll by 2 pixels
-//           duration: Duration(milliseconds: 20),
-//           curve: Curves.easeIn,
-//         );
-//       }
-//     }
-//   });
-// });

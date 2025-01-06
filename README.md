@@ -1,16 +1,38 @@
 # booked_ai
 
-A new Flutter project.
+To build and run this project, ensure you have the following installed:
 
-## Getting Started
+1. Development Environment
+   • Flutter SDK (Version 3.x or later recommended)
+   • Android Studio or Visual Studio Code
+   • Dart >=3.5.4 or later
+2. Platform-Specific Dependencies
+   • Android: Android API level 23+ with Gradle
+   • Web: Chrome, Edge, or Safari browsers
 
-This project is a starting point for a Flutter application.
+3. Libraries and Plugins Used
+   • Riverpod for state management
+   • intl
+   • cached_network_image
+   • firebase_core
+   • go_router
+   • flutter_svg
+   • url_strategy
+   • scroll_loop_auto_scroll
+   • font_awesome_flutter
+   • url_launcher
+   • video_player
 
-A few resources to get you started if this is your first Flutter project:
+#Installation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Follow these steps to get started:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the Repository
+
+• https://github.com/unlovedcake/Booked-AI
+• Open the root project folder for your prefer IDE for example VS code, Android Studio.
+
+2. Install Dependencies
+   Run the following command to install all necessary packages:
+   • flutter pub get
+   • flutter run

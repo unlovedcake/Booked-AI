@@ -4,39 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:video_player/video_player.dart';
 
-// final exploreNavBarTitleProvider = StateProvider<List<Map<String, String>>>((ref) {
-//   return [
-//     {'title': 'Explore', 'isHovering': 'Yes'},
-//     {'title': 'Deals', 'isHovering': 'No'},
-//     {'title': 'Blog', 'isHovering': 'No'},
-//     {'title': 'Partner with Us', 'isHovering': 'No'},
-//     {'title': 'About', 'isHovering': 'No'},
-//   ];
-// });
-
-// final isHoveringTheNavBar = StateProvider<String>((ref) {
-//   return 'Explore';
-// });
-
-// final currentIndexNavBar = StateProvider<int>((ref) {
-//   return 0;
-// });
-
-// final currentIndexSocialMedia = StateProvider<int?>((ref) {
-//   return null;
-// });
-
-// Riverpod provider for the MenuToggleNotifier
-// final menuToggleProvider = StateNotifierProvider<MenuToggleNotifier, bool>((ref) => MenuToggleNotifier());
-
-// class MenuToggleNotifier extends StateNotifier<bool> {
-//   MenuToggleNotifier() : super(false);
-
-//   void toggleMenu() => state = !state;
-// }
-
-class DealsViewModelNotifier extends ChangeNotifier {
+class HomeViewModelNotifier extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final DealsRepository _repository;
@@ -53,15 +23,23 @@ class DealsViewModelNotifier extends ChangeNotifier {
   bool isScrollingUp = false;
   bool hasReachedTop = true;
 
+  bool isVideoInitializing = false;
+
   double initialScrollOffset = 0.0;
 
   ScrollController? scrollController;
 
   ScrollController get controller => scrollController!;
 
-  DealsViewModelNotifier(this._repository) {
-    //addDeal();
+  late VideoPlayerController _videoController;
+
+  VideoPlayerController? get videoController => _videoController;
+
+  HomeViewModelNotifier(this._repository) {
     fetchDeals();
+
+    initializeVideo();
+
     scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
     scrollController!.addListener(_onScroll);
   }
@@ -70,7 +48,36 @@ class DealsViewModelNotifier extends ChangeNotifier {
   void dispose() {
     scrollController!.removeListener(_onScroll);
     scrollController!.dispose();
+    _videoController.dispose();
     super.dispose();
+  }
+
+  Future<void> initializeVideo() async {
+    isVideoInitializing = false;
+    _videoController = VideoPlayerController.networkUrl(
+      Uri.parse(
+          'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15%2F672049aa2301e32949611920_BA00005_9x16_DifferentAngleBookedAI-transcode.mp4'),
+    );
+    await _videoController.initialize().then((_) async {
+      isVideoInitializing = true;
+      _videoController.setVolume(0);
+      _videoController.setLooping(true);
+
+      _videoController.play();
+
+      print('Video Player');
+    });
+
+    notifyListeners();
+  }
+
+  void togglePlayPause() {
+    if (_videoController.value.isPlaying) {
+      _videoController.pause();
+    } else {
+      _videoController.play();
+    }
+    notifyListeners();
   }
 
   // Fetch deals from Firestore
@@ -87,47 +94,6 @@ class DealsViewModelNotifier extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<void> addDeal() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _firestore.collection('deals').add({
-        'title': 'Cheapest Flights to NewYork',
-        'description':
-            'Explore New York with travel AI deals on cheap flights. Save more on your next adventure using an AI travel agent.',
-        'createdAt': DateTime.now(),
-        'dealsDetails': [
-          {
-            'from': 'London',
-            'to': 'New York',
-            'name': 'JetBlue',
-            'type': 'Economy Round Trip',
-            'price': 799,
-            'dateAvailable': DateTime.now(),
-          },
-          // {
-          //   'from': 'Doha',
-          //   'to': 'Dubai',
-          //   'name': 'Emirates',
-          //   'type': 'Economy Round Trip',
-          //   'price': 179,
-          //   'dateAvailable': DateTime.now(),
-          // }
-        ],
-      });
-
-      print('Deal Added Successfully');
-
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = 'Failed to add deal: $e';
-      notifyListeners();
-    } finally {
-      _isLoading = false;
     }
   }
 
@@ -165,8 +131,37 @@ final dealsRepositoryProvider = Provider<DealsRepository>((ref) {
 });
 
 // Define the provider for DealsViewModelNotifier
-final dealsViewModelProvider = ChangeNotifierProvider<DealsViewModelNotifier>((ref) {
+final homeViewModelProvider = ChangeNotifierProvider<HomeViewModelNotifier>((ref) {
   final repository = ref.read(dealsRepositoryProvider);
 
-  return DealsViewModelNotifier(repository);
+  return HomeViewModelNotifier(repository);
 });
+
+// final videoControllerProvider = StateNotifierProvider<VideoControllerNotifier, VideoPlayerController?>(
+//   (ref) => VideoControllerNotifier(),
+// );
+
+// class VideoControllerNotifier extends StateNotifier<VideoPlayerController?> {
+//   VideoControllerNotifier() : super(null) {
+//     initializeVideo();
+//   }
+
+//   Future<void> initializeVideo() async {
+//     final controller = VideoPlayerController.networkUrl(
+//       Uri.parse(
+//           'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15%2F672049aa2301e32949611920_BA00005_9x16_DifferentAngleBookedAI-transcode.mp4'),
+//     );
+//     await controller.initialize();
+//     controller.setLooping(true);
+//     controller.play();
+//     state = controller;
+
+//     print('Video Player');
+//   }
+
+//   @override
+//   void dispose() {
+//     state?.dispose();
+//     super.dispose();
+//   }
+// }

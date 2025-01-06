@@ -1,4 +1,5 @@
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/views/explore/button_google_and_apple.dart';
 import 'package:booked_ai/views/explore/navbar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -122,30 +123,7 @@ class FooterWidget extends ConsumerWidget {
                     style: textTheme.bodyLarge?.copyWith(color: Colors.grey),
                   ),
                 ),
-                Container(
-                  width: 400,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  alignment: Alignment.center,
-                  child: Wrap(
-                    spacing: 20,
-                    children: [
-                      InkWell(
-                        onTap: () {},
-                        child: SvgPicture.network(
-                          fit: BoxFit.cover,
-                          'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6613ccc0821e816951d67ff4_googleplay.svg',
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {},
-                        child: SvgPicture.network(
-                          fit: BoxFit.cover,
-                          'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6613ccd51e501225d2fb36c6_appstore.svg',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const ButtonGoogleAndApple(),
                 Container(
                   width: 400,
                   height: 40,

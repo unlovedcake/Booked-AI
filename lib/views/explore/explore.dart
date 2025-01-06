@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:booked_ai/models/explore_model.dart';
 import 'package:booked_ai/themes/app_colors.dart';
+import 'package:booked_ai/view_models/home_view_model.dart';
+import 'package:booked_ai/views/explore/app_logo_widget.dart';
 import 'package:booked_ai/views/explore/footer_widget.dart';
 import 'package:booked_ai/views/explore/grid_view_widget.dart';
 import 'package:booked_ai/views/explore/header_widget.dart';
@@ -12,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../view_models/explore_view_model.dart';
@@ -26,14 +29,16 @@ class ExploreView extends ConsumerWidget {
     print('Screen Width $sizeWidth');
 
     final textTheme = Theme.of(context).textTheme;
-    final scrollControllerNotifiers = ref.watch(exploreViewModelProvider);
-    final scrollController = scrollControllerNotifiers.controller;
-    final isScrollingReachTheTop = scrollControllerNotifiers.hasReachedTop;
+    final exploreViewModel = ref.watch(exploreViewModelProvider);
+    final scrollController = exploreViewModel.controller;
+    final isScrollingReachTheTop = exploreViewModel.hasReachedTop;
 
-    var isMenuOpen = scrollControllerNotifiers.isToggleMenu;
-    var isGetTheBeta = scrollControllerNotifiers.isToggleGetBeta;
+    final homeViewModel = ref.watch(homeViewModelProvider);
 
-    scrollControllerNotifiers.setCurrentIndexNavBar(0);
+    var isMenuOpen = exploreViewModel.isToggleMenu;
+    var isGetTheBeta = exploreViewModel.isToggleGetBeta;
+
+    exploreViewModel.setCurrentIndexNavBar(0);
 
     final menuToggle = ref.read(exploreViewModelProvider.notifier);
 
@@ -98,7 +103,7 @@ class ExploreView extends ConsumerWidget {
                           image: NetworkImage(
                             'https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjk2MC1uaW5nLTMwLmpwZw.jpg',
                           ),
-                          fit: BoxFit.cover, // Adjust how the image is fitted
+                          fit: BoxFit.cover,
                         ),
                       ),
                       child: Wrap(
@@ -213,11 +218,7 @@ class ExploreView extends ConsumerWidget {
                                       : 140),
                           child: Row(
                             children: [
-                              SizedBox(
-                                height: 60,
-                                child: Image.network(
-                                    'https://cdn.prod.website-files.com/66135eefe155eff203cd2c15/6711d4c2add268ab486ba5e2_Logo%20(7)-p-500.png'),
-                              ),
+                              const AppLogoWidget(),
                               const Expanded(child: SizedBox()),
                               MediaQuery.of(context).size.width <= 1126
                                   ? IconButton(

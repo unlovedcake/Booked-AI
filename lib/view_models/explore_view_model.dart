@@ -43,7 +43,7 @@ class ExploreViewModelNotifier extends ChangeNotifier {
 
   double initialScrollOffset = 0.0;
 
-  int _currentIndexNavBar = 0;
+  int _currentIndexNavBar = 6;
 
   int get currentIndexNavBar => _currentIndexNavBar;
 
@@ -100,7 +100,8 @@ class ExploreViewModelNotifier extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void disposeController() {
+  @override
+  void dispose() {
     scrollController!.removeListener(_onScroll);
     scrollController!.dispose();
     super.dispose();
