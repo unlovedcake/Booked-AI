@@ -9,32 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-final currentPageProvider = StateProvider<String>((ref) => '/explore');
-
-// GoRouter configuration
-final goRouterProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
-    initialLocation: ref.read(currentPageProvider),
-    routes: [
-      GoRoute(
-        path: '/explore',
-        builder: (context, state) => ExploreView(),
-      ),
-      GoRoute(
-        path: '/deals',
-        builder: (context, state) => DealsView(),
-      ),
-    ],
-    redirect: (context, state) {
-      ref.read(currentPageProvider.notifier).state = state.matchedLocation;
-
-      print('state.matchedLocation ${state.matchedLocation}');
-
-      return null;
-    },
-  );
-});
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -49,19 +23,14 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //final goRouter = ref.watch(appRouter);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-
       title: 'Book AI',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       routerConfig: appRouter,
-      // routerDelegate: goRouter.routerDelegate,
-      // routeInformationParser: goRouter.routeInformationParser,
-      // routeInformationProvider: goRouter.routeInformationProvider,
     );
   }
 }
